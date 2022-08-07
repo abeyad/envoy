@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package envoy.extensions.xds;
+
+import "google/protobuf/timestamp.proto";
+import "envoy/service/discovery/v3/discovery.proto";
+
+// [#not-implemented-hide:]
+// Represents a list of xDS resources for an xDS authority and resource type URL tuple. Used to
+// serialize xDS resources in the KeyValueStoreXdsDelegate.
+message ResourceList {
+  repeated envoy.service.discovery.v3.Resource resources = 1;
+
+  // The timestamp at which the xDS resources list was last updated in the KV store.
+  google.protobuf.Timestamp last_updated = 2;
+};

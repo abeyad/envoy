@@ -167,6 +167,12 @@ private:
   void queueDiscoveryRequest(absl::string_view queue_item);
   // Invoked when dynamic context parameters change for a resource type.
   void onDynamicContextUpdate(absl::string_view resource_type_url);
+  // Must be invoked from the main or test thread.
+  void loadConfigFromDelegate(const std::string& type_url);
+  // Must be invoked from the main or test thread.
+  void processDiscoveryResources(const std::vector<DecodedResourcePtr>& resources,
+                                 ApiState& api_state, const std::string& type_url,
+                                 const std::string& version_info, bool call_delegate);
 
   GrpcStream<envoy::service::discovery::v3::DiscoveryRequest,
              envoy::service::discovery::v3::DiscoveryResponse>

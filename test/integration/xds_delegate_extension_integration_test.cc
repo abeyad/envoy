@@ -30,7 +30,7 @@ public:
 
   std::vector<envoy::service::discovery::v3::Resource>
   getResources(const std::string& /*authority_id*/,
-               const std::string& /*resource_type_url*/) override {
+               const std::string& /*resource_type_url*/) const override {
     // TODO(abeyad): implement this and test for it when we add support for loading config from the
     // delegate in a subsequent PR.
     return {};
@@ -52,9 +52,9 @@ public:
 
   std::string name() const override { return "envoy.config.xds.test_delegate"; };
 
-  Config::XdsResourcesDelegatePtr createXdsResourcesDelegate(const ProtobufWkt::Any&,
-                                                             ProtobufMessage::ValidationVisitor&,
-                                                             Api::Api&) override {
+  Config::XdsResourcesDelegatePtr
+  createXdsResourcesDelegate(const ProtobufWkt::Any&, ProtobufMessage::ValidationVisitor&,
+                             Api::Api&, Event::Dispatcher& dispatcher) override {
     return std::make_unique<TestXdsResourcesDelegate>();
   }
 };

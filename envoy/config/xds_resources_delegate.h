@@ -38,7 +38,7 @@ public:
    * @return A set of xDS resources for the given authority and type.
    */
   virtual std::vector<envoy::service::discovery::v3::Resource>
-  getResources(const std::string& authority_id, const std::string& resource_type_url) PURE;
+  getResources(const std::string& authority_id, const std::string& resource_type_url) const PURE;
 
   /**
    * Invoked when SotW xDS configuration updates have been received from an xDS authority, have been
@@ -69,14 +69,15 @@ public:
    * @param config Configuration of the XdsResourcesDelegate to create.
    * @param validation_visitor Validates the configuration.
    * @param api The APIs that can be used by the delegate.
+   * @param dispatcher The dispatcher for the thread.
    * @return The created XdsResourcesDelegate instance
    */
   virtual XdsResourcesDelegatePtr
   createXdsResourcesDelegate(const ProtobufWkt::Any& config,
-                             ProtobufMessage::ValidationVisitor& validation_visitor,
-                             Api::Api& api) PURE;
+                             ProtobufMessage::ValidationVisitor& validation_visitor, Api::Api& api,
+                             Event::Dispatcher& dispatcher) PURE;
 
-  std::string category() const override { return "envoy.config.xds"; }
+  std::string category() const override { return "envoy.xds_delegates"; }
 };
 
 } // namespace Config

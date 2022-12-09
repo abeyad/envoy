@@ -19,6 +19,7 @@ struct EnvoyError {
 };
 
 using EnvoyErrorSharedPtr = std::shared_ptr<EnvoyError>;
+                          
 
 } // namespace Platform
 } // namespace Envoy

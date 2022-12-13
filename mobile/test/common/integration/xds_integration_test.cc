@@ -1,8 +1,9 @@
-#include "test/common/integration/xds_integration_test.h"
 #include "xds_integration_test.h"
 
 #include "envoy/config/bootstrap/v3/bootstrap.pb.h"
 #include "envoy/config/cluster/v3/cluster.pb.h"
+
+#include "source/common/common/thread.h"
 
 #include "test/common/grpc/grpc_client_integration.h"
 #include "test/common/integration/base_client_integration_test.h"
@@ -108,25 +109,22 @@ std::string XdsIntegrationTest::getRuntimeKey(const std::string& key) {
   return "";
 }
 
-// TODO(abeyad): Change this implementation to use the PulseClient once implemented. See
-// https://github.com/envoyproxy/envoy-mobile/issues/2356 for details.
 uint64_t XdsIntegrationTest::getCounterValue(const std::string& counter) {
-  auto response = IntegrationUtil::makeSingleRequest(lookupPort("admin"), "GET", "/stats?usedonly",
-                                                     "", Http::CodecType::HTTP2, version_);
-  EXPECT_TRUE(response->complete());
-  EXPECT_EQ("200", response->headers().getStatusValue());
-  std::stringstream ss(response->body());
-  std::string line;
-  while (std::getline(ss, line, '\n')) {
-    auto pos = line.find(':');
-    if (pos == std::string::npos) {
-      continue;
-    }
-    if (line.substr(0, pos) == counter) {
-      return std::stoi(line.substr(pos + 1));
-    }
+  uint64_t counter_value = 0UL;
+  uint64_t* counter_value_ptr = &counter_value;
+  Thread::MutexBasicLockable mutex;
+  Thread::CondVar counter_fetched;
+  engine_->pulseClient()->counter(
+      counter, [counter_value_ptr, &mutex, &counter_fetched](uint64_t value) -> void {
+        Thread::LockGuard lock(mutex);
+        *counter_value_ptr = value;
+        counter_fetched.notifyAll();
+      });
+  {
+    Thread::LockGuard lock(mutex);
+    counter_fetched.wait(mutex);
   }
-  return 0;
+  return counter_value;
 }
 
 AssertionResult XdsIntegrationTest::waitForCounterGe(const std::string& name, uint64_t value) {

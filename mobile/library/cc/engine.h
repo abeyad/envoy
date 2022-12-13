@@ -15,6 +15,9 @@ namespace Platform {
 class StreamClient;
 using StreamClientSharedPtr = std::shared_ptr<StreamClient>;
 
+class PulseClient;
+using PulseClientSharedPtr = std::shared_ptr<PulseClient>;
+
 class Engine : public std::enable_shared_from_this<Engine> {
 public:
   StreamClientSharedPtr streamClient();
@@ -29,6 +32,8 @@ private:
   friend class EngineBuilder;
   // required to use envoy_engine_t without exposing it publicly
   friend class StreamPrototype;
+  // required to use envoy_engine_t without exposing it publicly
+  friend class PulseClient;
   // for testing only
   friend class ::Envoy::BaseClientIntegrationTest;
 

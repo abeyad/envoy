@@ -29,6 +29,7 @@ envoy_cc_library(
         "headers_builder.cc",
         "key_value_store.cc",
         "log_level.cc",
+        "pulse_client.cc",
         "request_headers.cc",
         "request_headers_builder.cc",
         "request_method.cc",

@@ -3,6 +3,7 @@
 #include "envoy/stats/histogram.h"
 
 #include "source/common/common/lock_guard.h"
+#include "source/common/stats/symbol_table.h"
 
 #include "library/common/bridge/utility.h"
 #include "library/common/config/internal.h"
@@ -185,54 +186,72 @@ envoy_status_t Engine::terminate() {
 
 Engine::~Engine() { terminate(); }
 
-envoy_status_t Engine::recordCounterInc(const std::string& elements, envoy_stats_tags tags,
-                                        uint64_t count) {
-  ENVOY_LOG(trace, "[pulse.{}] recordCounterInc", elements);
+Stats::Counter& Engine::getCounter(const std::string& elements, envoy_stats_tags tags) {
   ASSERT(dispatcher_->isThreadSafe(), "pulse calls must run from dispatcher's context");
   Stats::StatNameTagVector tags_vctr =
       Stats::Utility::transformToStatNameTagVector(tags, stat_name_set_);
   std::string name = Stats::Utility::sanitizeStatsName(elements);
-  Stats::Utility::counterFromElements(*client_scope_, {Stats::DynamicName(name)}, tags_vctr)
-      .add(count);
+  return Stats::Utility::counterFromElements(*client_scope_, {Stats::DynamicName(name)}, tags_vctr);
+}
+
+Stats::Gauge& Engine::getGauge(const std::string& elements, envoy_stats_tags tags) {
+  ASSERT(dispatcher_->isThreadSafe(), "pulse calls must run from dispatcher's context");
+  Stats::StatNameTagVector tags_vctr =
+      Stats::Utility::transformToStatNameTagVector(tags, stat_name_set_);
+  std::string name = Stats::Utility::sanitizeStatsName(elements);
+  return Stats::Utility::gaugeFromElements(*client_scope_, {Stats::DynamicName(name)},
+                                           Stats::Gauge::ImportMode::NeverImport, tags_vctr);
+}
+
+envoy_status_t Engine::getCounterValue(const std::string& name, envoy_stats_tags tags,
+                                       std::function<void(uint64_t)> callback) {
+  ASSERT(dispatcher_->isThreadSafe(), "pulse calls must run from dispatcher's context");
+  Stats::StatNameTagVector tags_vctr =
+      Stats::Utility::transformToStatNameTagVector(tags, stat_name_set_);
+  Stats::StatNamePool pool(server_->stats().symbolTable());
+  Stats::StatName statName = pool.add(Stats::Utility::sanitizeStatsName(name));
+  Stats::Counter& counter =
+      Stats::Utility::counterFromElements(server_->stats(), {statName}, tags_vctr);
+  callback(counter.value());
+  return ENVOY_SUCCESS;
+}
+
+envoy_status_t Engine::getGaugeValue(const std::string& name, envoy_stats_tags tags,
+                                     std::function<void(uint64_t)> callback) {
+  Stats::Gauge& gauge = getGauge(name, tags);
+  callback(gauge.value());
+  return ENVOY_SUCCESS;
+}
+
+envoy_status_t Engine::recordCounterInc(const std::string& elements, envoy_stats_tags tags,
+                                        uint64_t count) {
+  ENVOY_LOG(trace, "[pulse.{}] recordCounterInc", elements);
+  Stats::Counter& counter = getCounter(elements, tags);
+  counter.add(count);
   return ENVOY_SUCCESS;
 }
 
 envoy_status_t Engine::recordGaugeSet(const std::string& elements, envoy_stats_tags tags,
                                       uint64_t value) {
   ENVOY_LOG(trace, "[pulse.{}] recordGaugeSet", elements);
-  ASSERT(dispatcher_->isThreadSafe(), "pulse calls must run from dispatcher's context");
-  Stats::StatNameTagVector tags_vctr =
-      Stats::Utility::transformToStatNameTagVector(tags, stat_name_set_);
-  std::string name = Stats::Utility::sanitizeStatsName(elements);
-  Stats::Utility::gaugeFromElements(*client_scope_, {Stats::DynamicName(name)},
-                                    Stats::Gauge::ImportMode::NeverImport, tags_vctr)
-      .set(value);
+  Stats::Gauge& gauge = getGauge(elements, tags);
+  gauge.set(value);
   return ENVOY_SUCCESS;
 }
 
 envoy_status_t Engine::recordGaugeAdd(const std::string& elements, envoy_stats_tags tags,
                                       uint64_t amount) {
   ENVOY_LOG(trace, "[pulse.{}] recordGaugeAdd", elements);
-  ASSERT(dispatcher_->isThreadSafe(), "pulse calls must run from dispatcher's context");
-  Stats::StatNameTagVector tags_vctr =
-      Stats::Utility::transformToStatNameTagVector(tags, stat_name_set_);
-  std::string name = Stats::Utility::sanitizeStatsName(elements);
-  Stats::Utility::gaugeFromElements(*client_scope_, {Stats::DynamicName(name)},
-                                    Stats::Gauge::ImportMode::NeverImport, tags_vctr)
-      .add(amount);
+  Stats::Gauge& gauge = getGauge(elements, tags);
+  gauge.add(amount);
   return ENVOY_SUCCESS;
 }
 
 envoy_status_t Engine::recordGaugeSub(const std::string& elements, envoy_stats_tags tags,
                                       uint64_t amount) {
   ENVOY_LOG(trace, "[pulse.{}] recordGaugeSub", elements);
-  ASSERT(dispatcher_->isThreadSafe(), "pulse calls must run from dispatcher's context");
-  Stats::StatNameTagVector tags_vctr =
-      Stats::Utility::transformToStatNameTagVector(tags, stat_name_set_);
-  std::string name = Stats::Utility::sanitizeStatsName(elements);
-  Stats::Utility::gaugeFromElements(*client_scope_, {Stats::DynamicName(name)},
-                                    Stats::Gauge::ImportMode::NeverImport, tags_vctr)
-      .sub(amount);
+  Stats::Gauge& gauge = getGauge(elements, tags);
+  gauge.sub(amount);
   return ENVOY_SUCCESS;
 }
 

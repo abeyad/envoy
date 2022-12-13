@@ -1,6 +1,7 @@
 #pragma once
 
 #include "envoy/server/lifecycle_notifier.h"
+#include "envoy/stats/stats.h"
 
 #include "source/common/common/logger.h"
 #include "source/extensions/clusters/logical_dns/logical_dns_cluster.h"
@@ -61,6 +62,25 @@ public:
    * @return Network::ConnectivityManager&, the network connectivity_manager.
    */
   Network::ConnectivityManager& networkConnectivityManager();
+
+  /**
+   * Gets the value associated with a given counter and invokes the callback with the counter's
+   * value.
+   * @param name name of the counter
+   * @param tags, custom tags of the reporting stat.
+   * @param callback the callback to invoke with the value of the counter.
+   */
+  envoy_status_t getCounterValue(const std::string& name, envoy_stats_tags tags,
+                                 std::function<void(uint64_t)> callback);
+
+  /**
+   *Gets the value associated with a given gauge and invokes the callback with the gauge's value.
+   * @param name name of the gauge
+   * @param tags, custom tags of the reporting stat.
+   * @param callback the callback to invoke with the value of the gauge.
+   */
+  envoy_status_t getGaugeValue(const std::string& name, envoy_stats_tags tags,
+                               std::function<void(uint64_t)> callback);
 
   /**
    * Increment a counter with a given string of elements and by the given count.
@@ -133,6 +153,20 @@ private:
   envoy_status_t main(std::string config, std::string log_level, std::string admin_address_path);
   static void logInterfaces(absl::string_view event,
                             std::vector<Network::InterfacePair>& interfaces);
+
+  /**
+   * Gets the Counter associated with a given string of elements.
+   * @param elements, joined elements of the timeseries.
+   * @param tags, custom tags of the reporting stat.
+   */
+  Stats::Counter& getCounter(const std::string& elements, envoy_stats_tags tags);
+
+  /**
+   * Gets the Gauge associated with a given string of elements.
+   * @param elements, joined elements of the timeseries.
+   * @param tags, custom tags of the reporting stat.
+   */
+  Stats::Gauge& getGauge(const std::string& elements, envoy_stats_tags tags);
 
   Event::Dispatcher* event_dispatcher_{};
   Stats::ScopeSharedPtr client_scope_;

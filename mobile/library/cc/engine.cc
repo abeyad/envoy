@@ -16,7 +16,9 @@ StreamClientSharedPtr Engine::streamClient() {
   return std::make_shared<StreamClient>(shared_from_this());
 }
 
-PulseClientSharedPtr Engine::pulseClient() { return std::make_shared<PulseClient>(); }
+PulseClientSharedPtr Engine::pulseClient() {
+  return std::make_shared<PulseClient>(shared_from_this());
+}
 
 void Engine::terminate() {
   if (terminated_) {

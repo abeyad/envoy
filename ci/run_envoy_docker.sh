@@ -134,6 +134,7 @@ docker run --rm \
        -e BAZEL_REMOTE_CACHE \
        -e BAZEL_STARTUP_EXTRA_OPTIONS \
        -e CI_BRANCH \
+       -e CI_DEBUG \
        -e CI_SHA1 \
        -e CI_TARGET_BRANCH \
        -e DOCKERHUB_USERNAME \

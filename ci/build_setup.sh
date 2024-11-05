@@ -81,7 +81,9 @@ BAZEL_STARTUP_OPTIONS=(
 bazel () {
     local startup_options
     read -ra startup_options <<< "${BAZEL_STARTUP_OPTION_LIST:-}"
-    # echo "RUNNING BAZEL (${PWD}): ${startup_options[*]} <> ${*}" >&2
+    if [[ -n "$CI_DEBUG" ]]; then
+        echo "RUNNING BAZEL (${PWD}): ${startup_options[*]} <> ${*}" >&2
+    fi
     "$_bazel" "${startup_options[@]}" "$@"
 }
 

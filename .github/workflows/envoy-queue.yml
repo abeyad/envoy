@@ -1,0 +1,52 @@
+name: Envoy/queue
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      label:
+        type: string
+        default: queue
+      pr:
+        type: boolean
+        default: true
+
+env:
+  COMMITTER_NAME: dependency-envoy[bot]
+  COMMITTER_EMAIL: 148525496+dependency-envoy[bot]@users.noreply.github.com
+
+jobs:
+  merge-queue:
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      pull-requests: read
+    name: Create merge queue PR
+    runs-on: ubuntu-22.04
+    steps:
+    - id: appauth
+      name: Appauth
+      uses: envoyproxy/toolshed/gh-actions/appauth@actions-v0.3.5
+      with:
+        app_id: ${{ secrets.ENVOY_CI_DEP_APP_ID }}
+        key: ${{ secrets.ENVOY_CI_DEP_APP_KEY }}
+    - id: checkout
+      name: Checkout Envoy repository
+      uses: envoyproxy/toolshed/gh-actions/github/checkout@actions-v0.3.5
+      with:
+        token: ${{ steps.appauth.outputs.token }}
+    - name: Find queued PRs
+      id: all-prs
+      run: |
+        PRS=$(gh pr list --label "queue" --state open --json number,title,url,statusCheckRollup)
+        echo "prs=${PRS}" >> $GITHUB_OUTPUT
+      env:
+        GH_TOKEN: ${{ github.token }}
+    - uses: envoyproxy/toolshed/gh-actions/jq@actions-v0.3.5
+      with:
+        input: ${{ steps.all-prs.outputs.prs }}
+        filter: .
+        print-result: true

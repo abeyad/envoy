@@ -49,7 +49,7 @@ jobs:
     permissions:
       contents: read
     name: Generate CI report
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: envoyproxy/toolshed/gh-actions/github/checkout@actions-v0.2.36
       id: checkout

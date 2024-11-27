@@ -1,0 +1,32 @@
+name: Envoy/clang-tidy
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+  - cron: '0 8 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+
+jobs:
+  clang-tidy:
+    permissions:
+      contents: read
+      packages: read
+    runs-on: ubuntu-24.04
+    steps:
+    - id: checkout
+      name: Checkout Envoy repository
+      uses: envoyproxy/toolshed/gh-actions/github/checkout@actions-v0.3.11
+    - run: |
+        ./ci/run_envoy_docker.sh ./ci/do_ci.sh clang-tidy
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        BAZEL_BUILD_EXTRA_OPTIONS: >-
+          --config=remote-ci
+          --config=remote-envoy-engflow

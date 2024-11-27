@@ -107,7 +107,8 @@ CheckOptions:
 - key: readability-identifier-naming.FunctionCase
   value: 'camelBack'
 
-HeaderFilterRegex: '^./source/.*|^./contrib/.*|^./test/.*|^./envoy/.*'
+# HeaderFilterRegex: '^./source/.*|^./contrib/.*|^./test/.*|^./envoy/.*'
+HeaderFilterRegex: '^$'
 
 UseColor: true
 
@@ -117,4 +118,4 @@ WarningsAsErrors: '*'
 ## trigger a full run of clang-tidy against all files.
 ## It can be useful as it seems some header changes may not trigger the
 ## expected rerun.
-# v0
+# v3

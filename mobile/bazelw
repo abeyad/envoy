@@ -4,6 +4,8 @@ set -euo pipefail
 
 readonly bazelisk_version="1.15.0"
 
+ACTUAL_ARCH=$(uname -m)
+
 if [[ $OSTYPE == darwin* ]]; then
   readonly bazel_os="darwin"
 else

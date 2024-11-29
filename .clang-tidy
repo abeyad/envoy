@@ -118,4 +118,4 @@ WarningsAsErrors: '*'
 ## trigger a full run of clang-tidy against all files.
 ## It can be useful as it seems some header changes may not trigger the
 ## expected rerun.
-# v3
+# v12

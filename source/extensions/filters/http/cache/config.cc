@@ -29,8 +29,8 @@ Http::FilterFactoryCb CacheFilterFactory::createFilterFactoryFromProtoTyped(
   return [config = std::make_shared<CacheFilterConfig>(config, context.serverFactoryContext()),
           cache](Http::FilterChainFactoryCallbacks& callbacks) -> void {
     callbacks.addStreamFilter(std::make_shared<CacheFilter>(config, cache));
-  };
-}
+  }; // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 REGISTER_FACTORY(CacheFilterFactory, Server::Configuration::NamedHttpFilterConfigFactory);
 

@@ -539,6 +539,7 @@ TEST_P(HttpServerPropertiesCacheImplTest, ExplicitAlternativeTakesPriorityOverCa
 }
 
 // Execute all tests when key value store is nullptr and when it is valid.
+ // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
 INSTANTIATE_TEST_SUITE_P(HttpServerPropertiesCacheImplTestSuite, HttpServerPropertiesCacheImplTest,
                          testing::Values(nullptr, new NiceMock<MockKeyValueStore>()));
 } // namespace

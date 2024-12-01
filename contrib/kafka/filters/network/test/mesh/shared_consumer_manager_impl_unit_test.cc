@@ -305,7 +305,7 @@ TEST_F(RecordDistributorTest, ShouldRegisterCallbackAndPassItMatchingMessages) {
   // Callback got registered.
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 0), 1);
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 1), 1);
-}
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 TEST_F(RecordDistributorTest, ShouldNotRegisterCallbackIfItGotSatisfied) {
   // given
@@ -336,7 +336,7 @@ TEST_F(RecordDistributorTest, ShouldNotRegisterCallbackIfItGotSatisfied) {
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 0), -1);
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 1), -1);
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 2), -1);
-}
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 // Very similar to previous one, but makes sure we clean up vectors in record map.
 TEST_F(RecordDistributorTest, ShouldNotRegisterCallbackIfItGotSatisfiedWithLastRecordInPartition) {
@@ -362,7 +362,7 @@ TEST_F(RecordDistributorTest, ShouldNotRegisterCallbackIfItGotSatisfiedWithLastR
   ASSERT_EQ(testee->getRecordCountForTest("topic", 0), -1);
   // Callback was not registered.
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 0), -1);
-}
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 TEST_F(RecordDistributorTest, ShouldNotRegisterCallbackIfItRejectsRecords) {
   // given
@@ -393,7 +393,7 @@ TEST_F(RecordDistributorTest, ShouldNotRegisterCallbackIfItRejectsRecords) {
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 0), -1);
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 1), -1);
   ASSERT_EQ(testee->getCallbackCountForTest("topic", 2), -1);
-}
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 TEST_F(RecordDistributorTest, ShouldRemoveCallbackProperly) {
   // given

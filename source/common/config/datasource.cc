@@ -164,12 +164,12 @@ absl::StatusOr<DataSourceProviderPtr> DataSourceProvider::create(const ProtoData
               }
             });
         return absl::OkStatus();
-      });
+      }); // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
   RETURN_IF_NOT_OK(watcher_status);
 
   return std::unique_ptr<DataSourceProvider>(
       new DataSourceProvider(DynamicData(main_dispatcher, std::move(slot), std::move(watcher))));
-}
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 
 } // namespace DataSource
 } // namespace Config

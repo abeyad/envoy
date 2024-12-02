@@ -370,7 +370,8 @@ void DispatcherImpl::onFatalError(std::ostream& os) const {
   // Dump the state of the tracked objects in the dispatcher if thread safe. This generally
   // results in dumping the active state only for the thread which caused the fatal error.
   if (isThreadSafe()) {
-    for (auto iter = tracked_object_stack_.rbegin(); iter != tracked_object_stack_.rend(); ++iter) {
+    for (auto iter = std::make_reverse_iterator(tracked_object_stack_.end());
+         iter != std::make_reverse_iterator(tracked_object_stack_.begin()); ++iter) {
       (*iter)->dumpState(os);
     }
   }

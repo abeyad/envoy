@@ -395,7 +395,8 @@ void HeaderMapImpl::iterate(HeaderMap::ConstIterateCb cb) const {
 }
 
 void HeaderMapImpl::iterateReverse(HeaderMap::ConstIterateCb cb) const {
-  for (auto it = headers_.rbegin(); it != headers_.rend(); it++) {
+  for (auto it = std::make_reverse_iterator(headers_.end());
+       it != std::make_reverse_iterator(headers_.begin()); ++it) {
     if (cb(*it) == HeaderMap::Iterate::Break) {
       break;
     }

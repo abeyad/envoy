@@ -1665,7 +1665,8 @@ void ConnectionImpl::onProtocolConstraintViolation() {
 
 void ConnectionImpl::onUnderlyingConnectionBelowWriteBufferLowWatermark() {
   // Notify the streams based on least recently encoding to the connection.
-  for (auto it = active_streams_.rbegin(); it != active_streams_.rend(); ++it) {
+  for (auto it = std::make_reverse_iterator(active_streams_.end());
+       it != std::make_reverse_iterator(active_streams_.begin()); ++it) {
     (*it)->runLowWatermarkCallbacks();
   }
 }

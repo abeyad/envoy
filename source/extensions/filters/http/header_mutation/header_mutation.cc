@@ -45,7 +45,8 @@ Http::FilterHeadersStatus HeaderMutation::decodeHeaders(Http::RequestHeaderMap& 
     // other words, header mutations are evaluated in ascending order of specificity (same order as
     // `getAllPerFilterConfig` above returns).
     // Thus, here we reverse iterate the vector when `most_specific_wins` is false.
-    for (auto it = route_configs_.rbegin(); it != route_configs_.rend(); ++it) {
+    for (auto it = std::make_reverse_iterator(route_configs_.end());
+         it != std::make_reverse_iterator(route_configs_.begin()); ++it) {
       (*it).get().mutations().mutateRequestHeaders(headers, ctx, decoder_callbacks_->streamInfo());
     }
   } else {
@@ -68,7 +69,8 @@ Http::FilterHeadersStatus HeaderMutation::encodeHeaders(Http::ResponseHeaderMap&
   }
 
   if (!config_->mostSpecificHeaderMutationsWins()) {
-    for (auto it = route_configs_.rbegin(); it != route_configs_.rend(); ++it) {
+    for (auto it = std::make_reverse_iterator(route_configs_.end());
+         it != std::make_reverse_iterator(route_configs_.begin()); ++it) {
       (*it).get().mutations().mutateResponseHeaders(headers, ctx, encoder_callbacks_->streamInfo());
     }
   } else {

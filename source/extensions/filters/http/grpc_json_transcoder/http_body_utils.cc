@@ -87,7 +87,8 @@ void HttpBodyUtils::appendHttpBodyEnvelope(
                              CodedOutputStream::VarintSize64(content_length);
     std::vector<uint32_t> message_sizes;
     message_sizes.reserve(request_body_field_path.size());
-    for (auto it = request_body_field_path.rbegin(); it != request_body_field_path.rend(); ++it) {
+    for (auto it = std::make_reverse_iterator(request_body_field_path.end());
+         it != std::make_reverse_iterator(request_body_field_path.begin()); ++it) {
       const ProtobufWkt::Field* field = *it;
       const uint64_t message_size = envelope_size + content_length;
       const uint32_t field_number = (field->number() << 3) | ProtobufLengthDelimitedField;

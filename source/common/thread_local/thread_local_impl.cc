@@ -260,7 +260,8 @@ void InstanceImpl::shutdownThread() {
   //                     number than the first. This is an edge case that does not exist anywhere
   //                     in the code today, but we can keep this in mind if things become more
   //                     complicated in the future.
-  for (auto it = thread_local_data_.data_.rbegin(); it != thread_local_data_.data_.rend(); ++it) {
+  for (auto it = std::make_reverse_iterator(thread_local_data_.data_.end());
+       it != std::make_reverse_iterator(thread_local_data_.data_.begin()); ++it) {
     it->reset();
   }
   thread_local_data_.data_.clear();

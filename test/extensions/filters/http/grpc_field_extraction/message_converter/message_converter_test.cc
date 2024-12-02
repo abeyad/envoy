@@ -1176,7 +1176,8 @@ void runBatchAndDrainBackwards(const std::vector<Buffer::InstancePtr>& input_buf
 
   // Test that we can drain the underlying data in any order.
   // Specifically, we will drain backwards from `output_data`.
-  for (auto it = output_data.rbegin(); it != output_data.rend(); it++) {
+  for (auto it = std::make_reverse_iterator(output_data.end());
+       it != std::make_reverse_iterator(output_data.begin()); ++it) {
     checkSerializedData<CreateApiKeyRequest>(**it, {output_requests.back()});
     EXPECT_EQ((**it).length(), 0);
     output_requests.pop_back();

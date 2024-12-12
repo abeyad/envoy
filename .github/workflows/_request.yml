@@ -77,7 +77,7 @@ jobs:
     # *ALL* variables collected should be treated as untrusted and should be sanitized before
     # use
     - name: Generate environment variables from commit
-      uses: envoyproxy/toolshed/gh-actions/envoy/ci/request@actions-v0.3.13
+      uses: envoyproxy/toolshed/gh-actions/envoy/ci/request@f60b8cc01ee51d450aaaa2d5cab8735385b4d474
       id: env
       with:
         branch-name: ${{ steps.checkout.outputs.branch-name }}

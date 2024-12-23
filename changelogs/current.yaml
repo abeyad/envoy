@@ -117,6 +117,11 @@ minor_behavior_changes:
     config because existing provider already has up to date routes config.
     This behavioral change can be temporarily reverted by setting runtime guard
     ``envoy.reloadable_features.normalize_rds_provider_config`` to false.
+- area: http3
+  change: |
+    Default disabled the happy eyeballs feature to HTTP/3 upstream, as it doesn't currently work
+    well on VPN networks. This change can be reverted by setting
+    ``envoy.reloadable_features.http3_happy_eyeballs`` to ``true``.
 
 bug_fixes:
 # *Changes expected to improve the state of the world and are unlikely to have negative effects*

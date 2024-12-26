@@ -129,6 +129,9 @@ private:
   // address in each read operation. Only be instantiated if the non-zero address_cache_max_capacity
   // is passed in during the construction.
   std::unique_ptr<AddressInstanceLRUCache> recent_received_addresses_;
+
+  // For benchmark testing of non-public methods.
+  friend class IoSocketHandleImplBenchmarker;
 };
 } // namespace Network
 } // namespace Envoy

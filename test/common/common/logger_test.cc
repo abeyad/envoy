@@ -883,6 +883,24 @@ TEST(TaggedLogTest, TestTaggedLogWithJsonFormatMultipleJFlags) {
   object.logTaggedMessageWithPreCreatedTags();
 }
 
+TEST(LoggerContextTest, DestructionThreadSafety) {
+  auto lock_a = Thread::MutexBasicLockable();
+  auto lock_b = Thread::MutexBasicLockable();
+  std::unique_ptr<Context> context_a = std::make_unique<Context>(spdlog::level::level_enum::info, Logger::DEFAULT_LOG_FORMAT, lock_a, true, true);
+  std::unique_ptr<Context> context_b = std::make_unique<Context>(spdlog::level::level_enum::info, Logger::DEFAULT_LOG_FORMAT, lock_b, true, true);
+
+  auto thread_a = std::thread([&context_a]() {
+    context_a.reset();
+    });
+
+  auto thread_b = std::thread([&context_b]() {
+    context_b.reset();
+    });
+
+   thread_b.join();
+    thread_a.join();
+}
+
 } // namespace
 } // namespace Logger
 } // namespace Envoy

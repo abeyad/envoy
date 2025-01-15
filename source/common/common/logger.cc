@@ -175,17 +175,17 @@ static_assert(std::atomic<Context*>::is_always_lock_free);
 Context::Context(spdlog::level::level_enum log_level, const std::string& log_format,
                  Thread::BasicLockable& lock, bool should_escape, bool enable_fine_grain_logging)
     : log_level_(log_level), log_format_(log_format), lock_(lock), should_escape_(should_escape),
-      enable_fine_grain_logging_(enable_fine_grain_logging), save_context_(current_context) {
-  current_context = this;
-  activate();
+      enable_fine_grain_logging_(enable_fine_grain_logging) {
+  if (!current_context) {
+    current_context = this;
+    activate();
+  }
 }
 
 Context::~Context() {
-  current_context = save_context_;
-  if (current_context != nullptr) {
-    current_context.load()->activate();
-  } else {
-    Registry::getSink()->clearLock();
+  Registry::getSink()->clearLock();
+  if (current_context.load() == this) {
+    current_context = nullptr;
   }
 }
 

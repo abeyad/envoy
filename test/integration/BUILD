@@ -10,7 +10,7 @@ load(
     "envoy_select_admin_functionality",
     "envoy_select_enable_http3",
     "envoy_select_enable_yaml",
-    "envoy_select_envoy_mobile_listener",
+    "envoy_select_envoy_client_listener",
     "envoy_select_linkstatic",
     "envoy_sh_test",
 )
@@ -1172,7 +1172,7 @@ envoy_cc_test_library(
     ],
 )
 
-# The light verson of this library allows Envoy mobile e2e tests to pull minimal
+# The light verson of this library allows envoy client e2e tests to pull minimal
 # dependencies, so keep as few libraries as possible in scope of the excepton-free builds.
 envoy_cc_test_library(
     name = "http_integration_lib_light",
@@ -1373,7 +1373,7 @@ envoy_cc_test_library(
         "//source/common/quic:quic_client_factory_lib",
         "//source/common/quic:quic_server_factory_lib",
         "@quiche//:quic_test_tools_session_peer_lib",
-    ]) + envoy_select_envoy_mobile_listener([
+    ]) + envoy_select_envoy_client_listener([
         "//source/common/listener_manager:listener_manager_lib",
     ]),
 )
@@ -1529,7 +1529,7 @@ envoy_cc_test_library(
     ],
 )
 
-# The light verson of this library allows Envoy mobile e2e tests to pull minimal
+# The light verson of this library allows envoy client e2e tests to pull minimal
 # dependencies, so keep as few libraries as possible in scope of the excepton-free builds.
 envoy_cc_test_library(
     name = "integration_lib_light",

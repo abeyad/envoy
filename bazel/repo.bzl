@@ -6,7 +6,7 @@ REPO = "{repo}"
 REPO_GCR = "{repo_gcr}"
 SHA = "{sha}"
 SHA_GCC = "{sha_gcc}"
-SHA_MOBILE = "{sha_mobile}"
+SHA_CLIENT = "{sha_client}"
 SHA_WORKER = "{sha_worker}"
 TAG = "{tag}"
 
@@ -14,9 +14,9 @@ def image_gcc():
     return "%s@sha256:%s" % (
         REPO_GCR, SHA_GCC)
 
-def image_mobile():
+def image_client():
     return "%s@sha256:%s" % (
-        REPO, SHA_MOBILE)
+        REPO, SHA_CLIENT)
 
 def image_worker():
     return "%s@sha256:%s" % (
@@ -86,7 +86,7 @@ def _envoy_repo_impl(repository_ctx):
         repo_gcr = build_image["repo-gcr"],
         sha = build_image["sha"],
         sha_gcc = build_image["sha-gcc"],
-        sha_mobile = build_image["sha-mobile"],
+        sha_client = build_image["sha-client"],
         sha_worker = build_image["sha-worker"],
         tag = build_image["tag"],
     ))

@@ -284,9 +284,9 @@ constexpr absl::string_view null_device_path{"/dev/null"};
 #endif
 
 // Note: chromium disabled recvmmsg regardless of ndk version. However, the only Android target
-// currently actively using Envoy is Envoy Mobile, where recvmmsg is not actively disabled. In fact,
+// currently actively using Envoy is Envoy Client, where recvmmsg is not actively disabled. In fact,
 // defining mmsghdr here caused a conflicting definition with the ndk's definition of the struct
-// (https://github.com/envoyproxy/envoy-mobile/pull/772/checks?check_run_id=534152886#step:4:64).
+// (https://github.com/envoyproxy/envoy-client/pull/772/checks?check_run_id=534152886#step:4:64).
 // Therefore, we decided to remove the Android check introduced here in
 // https://github.com/envoyproxy/envoy/pull/10120. If someone out there encounters problems with
 // this please bring up in Envoy's slack channel #envoy-udp-quic-dev.

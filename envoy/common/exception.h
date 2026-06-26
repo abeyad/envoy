@@ -7,10 +7,10 @@
 
 namespace Envoy {
 
-// This is a workaround to allow an exceptionless Envoy Mobile build while we
+// This is a workaround to allow an exceptionless Envoy Client build while we
 // have not finished plumbing Satus/StatusOr<> based error handling, so
 // hard-failing instead. See
-// (https://github.com/envoyproxy/envoy-mobile/issues/176)
+// (https://github.com/envoyproxy/envoy-client/issues/176)
 // for example error handling PRs.
 // TODO(alyssawilk) finish up error handling and remove this.
 #ifdef ENVOY_DISABLE_EXCEPTIONS

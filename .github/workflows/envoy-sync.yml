@@ -27,7 +27,7 @@ jobs:
         downstream:
         - go-control-plane
         - data-plane-api
-        - mobile-website
+        - client-website
     steps:
     - name: Skip if superseded by a newer commit on main
       id: tip

@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package envoyclient.test.integration.filters.http.test_read;
+
+message TestRead {
+}

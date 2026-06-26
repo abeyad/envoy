@@ -65,9 +65,9 @@ package_group(
 )
 
 package_group(
-    name = "mobile_library",
+    name = "client_library",
     packages = [
-        "//mobile/...",
+        "//client/...",
     ],
 )
 

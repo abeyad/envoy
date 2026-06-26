@@ -2,7 +2,7 @@
 api
 docs
 examples/grpc-bridge/script
-mobile
+client
 tools/dev/src
 .project
 envoy-filter-example

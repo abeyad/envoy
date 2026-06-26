@@ -29,7 +29,7 @@ def _get_azp_link(check_id):
     return "https://dev.azure.com/{organization}/{project}/_build/results?buildId={buildId}&view=results".format(organization = _azp_organization, project = project, buildId = build_id)
 
 def _retry(config, comment_id, command):
-    if len(command.parts) > 1 and command.parts[1] == "mobile":
+    if len(command.parts) > 1 and command.parts[1] == "client":
         return
     check_ids, checks = _get_azp_checks()
 

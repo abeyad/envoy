@@ -21,7 +21,7 @@ routing PRs, questions, etc. to the right place.
 * Ryan Northey ([phlax](https://github.com/phlax)) (ryan@synca.io)
   * Docs, tooling, CI, containers and sandbox examples
 * Ryan Hamilton ([RyanTheOptimist](https://github.com/ryantheoptimist)) (rch@google.com)
-  * HTTP/3, upstream connection management, Envoy Mobile.
+  * HTTP/3, upstream connection management, Envoy Client.
 * Baiping Wang ([wbpcode](https://github.com/wbpcode)) (wbphub@gmail.com)
   * Upstream, LB, tracing, logging, performance, and generic/dubbo proxy.
 * Boteng Yao ([botengyao](https://github.com/botengyao)) (boteng@google.com)
@@ -59,14 +59,14 @@ routing PRs, questions, etc. to the right place.
 * Yanjun Xiang ([yanjunxiang-google](https://github.com/yanjunxiang-google)) (yanjunxiang@google.com)
   * ext_proc, dataplane, security.
 
-# Envoy mobile maintainers
+# envoy client maintainers
 
 The following Envoy maintainers have final say over any changes only affecting /mobile
 
 * Ali Beyad ([abeyad](https://github.com/abeyad)) (abeyad@google.com)
   * xDS, C++ integration tests.
 * Dan Zhang ([danzh2010](https://github.com/danzh2010)) (danzh@google.com)
-  * Envoy Mobile, QUIC, HTTP/3.
+  * Envoy Client, QUIC, HTTP/3.
 * Paul Ogilby ([paul-r-gall](https://github.com/paul-r-gall)) (pgal@google.com)
   * Language APIs, xDS.
 

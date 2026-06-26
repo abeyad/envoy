@@ -64,7 +64,7 @@ void UberFilterFuzzer::perFilterSetup(const std::string& filter_name) {
     read_filter_callbacks_->connection_.stream_info_.downstream_connection_info_provider_
         ->setRemoteAddress(pipe_addr_);
   } else if (filter_name == NetworkFilterNames::get().HttpConnectionManager ||
-             filter_name == NetworkFilterNames::get().EnvoyMobileHttpConnectionManager) {
+             filter_name == NetworkFilterNames::get().EnvoyClientHttpConnectionManager) {
     read_filter_callbacks_->connection_.stream_info_.downstream_connection_info_provider_
         ->setLocalAddress(pipe_addr_);
     read_filter_callbacks_->connection_.stream_info_.downstream_connection_info_provider_
@@ -156,17 +156,17 @@ void UberFilterFuzzer::checkInvalidInputForFuzzer(const std::string& filter_name
                          e.what()));
       }
     }
-  } else if (filter_name == NetworkFilterNames::get().EnvoyMobileHttpConnectionManager) {
+  } else if (filter_name == NetworkFilterNames::get().EnvoyClientHttpConnectionManager) {
     envoy::extensions::filters::network::http_connection_manager::v3::
-        EnvoyMobileHttpConnectionManager& config = *Envoy::Protobuf::DynamicCastMessage<
+        EnvoyClientHttpConnectionManager& config = *Envoy::Protobuf::DynamicCastMessage<
             envoy::extensions::filters::network::http_connection_manager::v3::
-                EnvoyMobileHttpConnectionManager>(config_message);
+                EnvoyClientHttpConnectionManager>(config_message);
     if (config.config().codec_type() ==
         envoy::extensions::filters::network::http_connection_manager::v3::HttpConnectionManager::
             HTTP3) {
       // Quiche is still in progress and http_conn_manager has a dedicated fuzzer.
       // So we won't fuzz it here with complex mocks.
-      throw EnvoyException(absl::StrCat("envoy_mobile_http_conn_manager trying to use Quiche which "
+      throw EnvoyException(absl::StrCat("envoy_client_http_conn_manager trying to use Quiche which "
                                         "we won't fuzz here. Config:\n{}",
                                         config.DebugString()));
     }

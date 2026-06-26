@@ -925,7 +925,7 @@ envoy.filters.network.http_connection_manager:
   status: stable
   type_urls:
   - envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
-envoy.filters.network.envoy_mobile_http_connection_manager:
+envoy.filters.network.envoy_client_http_connection_manager:
   categories:
   - envoy.filters.network
   security_posture: robust_to_untrusted_downstream

@@ -1442,11 +1442,11 @@ message RequestIDExtension {
   google.protobuf.Any typed_config = 1;
 }
 
-// [#protodoc-title: Envoy Mobile HTTP connection manager]
-// HTTP connection manager for use in Envoy mobile.
-// [#extension: envoy.filters.network.envoy_mobile_http_connection_manager]
-message EnvoyMobileHttpConnectionManager {
+// [#protodoc-title: Envoy Client HTTP connection manager]
+// HTTP connection manager for use in envoy client.
+// [#extension: envoy.filters.network.envoy_client_http_connection_manager]
+message EnvoyClientHttpConnectionManager {
   // The configuration for the underlying HttpConnectionManager which will be
-  // instantiated for Envoy mobile.
+  // instantiated for envoy client.
   HttpConnectionManager config = 1;
 }

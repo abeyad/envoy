@@ -23,8 +23,8 @@ load(
     _envoy_proto_library = "envoy_proto_library",
 )
 load(
-    ":envoy_mobile_defines.bzl",
-    _envoy_mobile_defines = "envoy_mobile_defines",
+    ":envoy_client_defines.bzl",
+    _envoy_client_defines = "envoy_client_defines",
 )
 load(":envoy_pch.bzl", _envoy_pch_library = "envoy_pch_library")
 load(
@@ -38,8 +38,8 @@ load(
     _envoy_select_enable_http3 = "envoy_select_enable_http3",
     _envoy_select_enable_http_datagrams = "envoy_select_enable_http_datagrams",
     _envoy_select_enable_yaml = "envoy_select_enable_yaml",
-    _envoy_select_envoy_mobile_listener = "envoy_select_envoy_mobile_listener",
-    _envoy_select_envoy_mobile_xds = "envoy_select_envoy_mobile_xds",
+    _envoy_select_envoy_client_listener = "envoy_select_envoy_client_listener",
+    _envoy_select_envoy_client_xds = "envoy_select_envoy_client_xds",
     _envoy_select_google_grpc = "envoy_select_google_grpc",
     _envoy_select_hot_restart = "envoy_select_hot_restart",
     _envoy_select_nghttp2 = "envoy_select_nghttp2",
@@ -81,7 +81,7 @@ def envoy_extension_package(enabled_default = True, default_visibility = EXTENSI
         flag_values = {":enabled": "True"},
     )
 
-def envoy_mobile_package(default_visibility = ["//visibility:public"]):
+def envoy_client_package(default_visibility = ["//visibility:public"]):
     envoy_extension_package(default_visibility = default_visibility)
 
 def envoy_contrib_package():
@@ -217,8 +217,8 @@ envoy_select_admin_html = _envoy_select_admin_html
 envoy_select_admin_no_html = _envoy_select_admin_no_html
 envoy_select_admin_functionality = _envoy_select_admin_functionality
 envoy_select_static_extension_registration = _envoy_select_static_extension_registration
-envoy_select_envoy_mobile_listener = _envoy_select_envoy_mobile_listener
-envoy_select_envoy_mobile_xds = _envoy_select_envoy_mobile_xds
+envoy_select_envoy_client_listener = _envoy_select_envoy_client_listener
+envoy_select_envoy_client_xds = _envoy_select_envoy_client_xds
 envoy_select_disable_logging = _envoy_select_disable_logging
 envoy_select_google_grpc = _envoy_select_google_grpc
 envoy_select_enable_http3 = _envoy_select_enable_http3
@@ -263,5 +263,5 @@ envoy_py_test = _envoy_py_test
 envoy_py_test_binary = _envoy_py_test_binary
 envoy_sh_test = _envoy_sh_test
 
-# Envoy Mobile defines (from envoy_mobile_defines.bz)
-envoy_mobile_defines = _envoy_mobile_defines
+# Envoy Client defines (from envoy_client_defines.bz)
+envoy_client_defines = _envoy_client_defines

@@ -173,7 +173,7 @@ This means that changes to CI must be tested/verified in the (private) staging r
 The CI workflows and actions are receptive to certain environment variables being set.
 
 `ENVOY_CI`: this allows CI to run in non-`envoyproxy/envoy` repos
-`ENVOY_MOBILE_CI`: this allows mobile CI to be run in non-`envoyproxy/envoy` repos
+`ENVOY_CLIENT_CI`: this allows mobile CI to be run in non-`envoyproxy/envoy` repos
 `ENVOY_MACOS_CI`: this allows macOS CI to be run in non-`envoyproxy/envoy` repos
 `ENVOY_WINDOWS_CI`: this allows Windows CI to be run in non-`envoyproxy/envoy` repos
 

@@ -1,0 +1,274 @@
+## Any new configs - ie that are not defined in Envoy's bazelrc ...
+#    **should be prefixed with client-**
+
+# Envoy Client Bazel build/test options.
+try-import ../.bazelrc
+
+#############################################################################
+# global
+#############################################################################
+
+# Common flags for all builds
+build --define=hot_restart=disabled
+build --define=tcmalloc=disabled
+build --define=admin_html=disabled
+build --define=static_extension_registration=disabled
+build --define=admin_functionality=disabled
+build --define envoy_client_listener=disabled
+build --define=library_autolink=disabled
+build --define=envoy_enable_http_datagrams=disabled
+build --experimental_inmemory_dotd_files
+build --experimental_inmemory_jdeps_files
+build --features=debug_prefix_map_pwd_is_dot
+build --features=swift.cacheable_swiftmodules
+build --features=swift.debug_prefix_map
+build --macos_minimum_os=14.5
+build --ios_simulator_version=18.1
+build --verbose_failures
+build --workspace_status_command=../bazel/get_workspace_status
+build --use_top_level_targets_for_symlinks
+build --experimental_repository_downloader_retries=2
+build --define=envoy_client_xds=disabled
+build --define=google_grpc=disabled
+build --define=nghttp2=disabled
+build --define=envoy_yaml=disabled
+build --define=envoy_full_protos=disabled
+build --define envoy_exceptions=disabled
+build: --copt=-fno-exceptions
+
+# https://github.com/bazelbuild/rules_jvm_external/issues/445
+build --repo_env=JAVA_HOME=../bazel_tools/jdk
+build --define disable_known_issue_asserts=true
+# Unset per_object_debug_info. Causes failures on Android Linux release builds.
+build --features=-per_object_debug_info
+# Suppress deprecated declaration warnings due to extensive transitive noise from protobuf.
+build --copt -Wno-deprecated-declarations
+build --define=signal_trace=disabled
+
+# Override PGV validation with NOP functions for binary size savings.
+build --@com_envoyproxy_protoc_gen_validate//bazel:template-flavor=nop
+
+# Instrument Envoy Client's C++ code for coverage
+coverage --instrumentation_filter="//library/common[/:]"
+
+#############################################################################
+# os
+#############################################################################
+
+# Common Engflow flags
+build:linux --disk_cache=
+build:linux --incompatible_strict_action_env=true
+
+# Default flags for builds targeting iOS
+# Manual stamping is necessary in order to get versioning information in the iOS
+# static framework.
+# More information on stamping can be found here:
+# https://github.com/envoyproxy/envoy/tree/master/bazel#enabling-optional-features
+build:ios --define=manual_stamp=manual_stamp
+build:ios --test_timeout=390,750,1500,5700
+build:ios --define=envoy_full_protos=enabled
+
+# Default flags for builds targeting Android
+build:android --define=logger=android
+build:android --java_language_version=8
+build:android --tool_java_language_version=8
+build:android --cxxopt=-Wno-nullability-completeness
+
+# Default flags for Android
+build:client-android --config=client-clang
+build:client-android --java_language_version=8
+build:client-android --tool_java_language_version=8
+build:client-android --cxxopt=-Wno-nullability-completeness
+test:client-android --build_tests_only
+test:client-android --define=static_extension_registration=disabled
+
+# Flags for release builds targeting Android or the JVM
+# Release does not use the option --define=logger=android
+build:client-android-release --config=client-android
+build:client-android-release --config=client-release-common
+build:client-android-release --compilation_mode=opt
+build:client-android-release --linkopt=-fuse-ld=lld
+build:client-android-release --android_platforms=@envoy//bazel/platforms/android:x86_64
+
+build:client-android-publish --config=client-android-release
+build:client-android-publish --config=client-release
+build:client-android-publish --android_platforms=@envoy//bazel/platforms/android:x86,@envoy//bazel/platforms/android:x86_64,@envoy//bazel/platforms/android:armeabi-v7a,@envoy//bazel/platforms/android::arm64-v8a
+
+
+#############################################################################
+# toolchain: clang
+#############################################################################
+# Clang toolchain options
+build:client-clang --config=libc++
+build:client-clang --host_platform=@mobile_clang_platform
+
+
+#############################################################################
+# platform: remote
+#############################################################################
+# RBE (Engflow mobile)
+build:client-rbe --google_default_credentials=false
+build:client-rbe --remote_cache=grpcs://envoy.cluster.engflow.com
+build:client-rbe --remote_executor=grpcs://envoy.cluster.engflow.com
+build:client-rbe --experimental_remote_downloader=grpcs://envoy.cluster.engflow.com
+build:client-rbe --bes_backend=grpcs://envoy.cluster.engflow.com/
+build:client-rbe --bes_results_url=https://envoy.cluster.engflow.com/invocation/
+build:client-rbe --credential_helper=*.engflow.com=%workspace%/bazel/engflow-bazel-credential-helper.sh
+build:client-rbe --grpc_keepalive_time=60s
+build:client-rbe --grpc_keepalive_timeout=30s
+build:client-rbe --remote_timeout=3600s
+build:client-rbe --bes_timeout=3600s
+build:client-rbe --bes_upload_mode=fully_async
+build:client-rbe --nolegacy_important_outputs
+build:client-rbe --jobs=40
+build:client-rbe --verbose_failures
+build:client-rbe --spawn_strategy=remote,sandboxed,local
+build:client-rbe --experimental_ui_max_stdouterr_bytes=10485760
+build:client-rbe --extra_execution_platforms=//bazel/platforms/rbe:linux_x64
+# Recover from transient gRPC failures (e.g. UNAVAILABLE: io exception) talking to engflow.
+build:client-rbe --remote_retries=10
+build:client-rbe --remote_retry_max_delay=60s
+build:client-rbe --experimental_remote_cache_eviction_retries=5
+
+
+#############################################################################
+# toolchains: sanitizers/linux
+#############################################################################
+# ASAN
+build:client-asan --config=asan
+build:client-asan --config=clang
+build:client-asan --config=client-clang
+build:client-asan --build_tests_only
+test:client-asan --test_env=ENVOY_IP_TEST_VERSIONS=v4only
+
+# MSAN
+build:client-msan --config=msan --config=clang
+
+# TSAN
+build:client-tsan --config=clang
+build:client-tsan --config=tsan
+build:client-tsan --config=client-clang
+build:client-tsan --build_tests_only
+test:client-tsan --test_env=ENVOY_IP_TEST_VERSIONS=v4only
+build:client-tsan --test_timeout=240,1200,3000,9600
+
+
+#############################################################################
+# tests: linux
+#############################################################################
+
+# CC
+test:client-cc --action_env=LD_LIBRARY_PATH
+build:client-cc --config=client-clang
+build:client-cc --test_env=ENVOY_IP_TEST_VERSIONS=v4only
+
+# CC with xDS
+build:client-cc-xds-enabled --config=client-cc
+build:client-cc-xds-enabled --define=envoy_client_xds=enabled
+
+# Coverage
+build:client-coverage --build_tests_only
+build:client-coverage --@envoy//tools/coverage:config=@envoy_client//test:coverage_config
+build:client-coverage --config=client-clang
+build:client-coverage --legacy_important_outputs=false
+build:client-coverage --test_env=ENVOY_IP_TEST_VERSIONS=v4only
+test:client-coverage --action_env=LD_LIBRARY_PATH
+
+
+#############################################################################
+# macos: These options are macOS-only
+#############################################################################
+
+build:rules_xcodeproj --config=ios
+build:rules_xcodeproj --define=apple.experimental.tree_artifact_outputs=0
+# Disable global index store to work around https://github.com/buildbuddy-io/rules_xcodeproj/issues/1878
+build:rules_xcodeproj --features=-swift.use_global_index_store
+
+build:client-macos --host_platform=@envoy//bazel/platforms/rbe:macos
+build:client-macos --platforms=@envoy//bazel/platforms/rbe:macos
+build:client-macos --extra_execution_platforms=@envoy//bazel/platforms/rbe:macos
+build:client-macos --xcode_version_config=//ci:xcode_config
+build:client-macos --remote_download_toplevel
+build:client-macos --config=ci
+build:client-macos --config=remote
+build:client-macos --define=envoy_full_protos=disabled
+
+build:client-ios --config=client-macos
+build:client-ios --config=ios
+build:client-ios --strategy=ProcessAndSign=sandboxed,local
+
+build:client-ios-swift --config=client-ios
+test:client-ios-swift --build_tests_only
+
+build:client-ios-obj-c --config=client-ios
+test:client-ios-obj-c --build_tests_only
+
+
+#############################################################################
+# release
+#############################################################################
+
+# order matters here to ensure downloads
+build:client-release --config=client-clang
+build:client-release --config=client-release-common
+build:client-release --remote_download_toplevel
+
+# Exclude debug info from the release binary since it makes it too large to fit
+# into a zip file. This shouldn't affect crash reports.
+build:client-release-common --define=no_debug_info=1
+# Compile releases optimizing for size (eg -Os, etc).
+build:client-release-common --config=sizeopt
+# Set default symbols visibility to hidden to reduce .dynstr and the symbol table size
+build:client-release-common --copt=-fvisibility=hidden
+# Enable automatic extension factory registration for release builds
+build:client-release-common --define=static_extension_registration=enabled
+
+# Flags for release builds targeting iOS
+build:client-release-ios --config=ios
+build:client-release-ios --config=client-release-common
+build:client-release-ios --compilation_mode=opt
+
+
+#############################################################################
+# toolchains: dbg
+#############################################################################
+
+build:client-dbg-common --compilation_mode=dbg
+# Enable source map for debugging in IDEs
+build:client-dbg-common --copt="-fdebug-compilation-dir" --copt="/proc/self/cwd"
+
+# Default flags for Android debug builds
+build:client-dbg-android --config=client-dbg-common
+build:client-dbg-android --config=android
+
+# Default flags for iOS debug builds
+build:client-dbg-ios --config=client-dbg-common
+build:client-dbg-ios --config=ios
+
+
+#############################################################################
+# compat: Remove immediately when PR lands
+#############################################################################
+
+build:client-remote-ci --config=ci
+
+build:client-remote-release --config=ci
+build:client-remote-release --config=client-rbe
+build:client-remote-release --config=client-release
+
+build:remote-ci --config=ci
+build:remote-ci --config=client-rbe
+
+build:client-macos-ios --config=ci
+build:client-macos-ios --config=client-rbe
+build:client-macos-ios --config=client-ios
+
+build:client-macos-ios-swift --config=ci
+build:client-macos-ios-swift --config=client-rbe
+build:client-macos-ios-swift --config=client-ios-swift
+
+build:client-macos-ios-obj-c --config=ci
+build:client-macos-ios-obj-c --config=client-rbe
+build:client-macos-ios-obj-c --config=client-ios-obj-c
+
+build:client-android-release-publish --config=client-android-publish

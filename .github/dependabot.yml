@@ -24,7 +24,7 @@ updates:
     time: "06:00"
 
 - package-ecosystem: "pip"
-  directory: "/mobile/tools/python"
+  directory: "/client/tools/python"
   open-pull-requests-limit: 20
   schedule:
     interval: "daily"

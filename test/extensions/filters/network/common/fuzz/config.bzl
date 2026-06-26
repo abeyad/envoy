@@ -3,7 +3,7 @@
 READFILTER_FUZZ_FILTERS = [
     "envoy.filters.network.client_ssl_auth",
     "envoy.filters.network.ext_authz",
-    "envoy.filters.network.envoy_mobile_http_connection_manager",
+    "envoy.filters.network.envoy_client_http_connection_manager",
     # A dedicated http_connection_manager fuzzer can be found in
     # test/common/http/conn_manager_impl_fuzz_test.cc
     "envoy.filters.network.http_connection_manager",

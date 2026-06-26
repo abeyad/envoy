@@ -59,8 +59,8 @@ setup_clang_toolchain() {
                 BAZEL_QUERY_OPTIONS+=("--config=remote-cache")
                 break
                 ;;
-            --config=mobile-rbe)
-                BAZEL_QUERY_OPTIONS+=("--config=mobile-rbe")
+            --config=client-rbe)
+                BAZEL_QUERY_OPTIONS+=("--config=client-rbe")
                 break
                 ;;
         esac

@@ -64,12 +64,12 @@ HttpApiListener::HttpApiListener(Network::Address::InstanceConstSharedPtr&& addr
       absl::StrCat(
           "type.googleapis.com/",
           createReflectableMessage(envoy::extensions::filters::network::http_connection_manager::
-                                       v3::EnvoyMobileHttpConnectionManager::default_instance())
+                                       v3::EnvoyClientHttpConnectionManager::default_instance())
               ->GetDescriptor()
               ->full_name())) {
     auto typed_config = MessageUtil::anyConvertAndValidate<
         envoy::extensions::filters::network::http_connection_manager::v3::
-            EnvoyMobileHttpConnectionManager>(config.api_listener().api_listener(),
+            EnvoyClientHttpConnectionManager>(config.api_listener().api_listener(),
                                               factory_context_.messageValidationVisitor());
 
     auto factory_or_error = Envoy::Extensions::NetworkFilters::HttpConnectionManager::

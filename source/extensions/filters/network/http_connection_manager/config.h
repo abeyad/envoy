@@ -80,16 +80,16 @@ class MobileHttpConnectionManagerFilterConfigFactory
     : Logger::Loggable<Logger::Id::config>,
       public Common::ExceptionFreeFactoryBase<
           envoy::extensions::filters::network::http_connection_manager::v3::
-              EnvoyMobileHttpConnectionManager> {
+              EnvoyClientHttpConnectionManager> {
 public:
   MobileHttpConnectionManagerFilterConfigFactory()
-      : ExceptionFreeFactoryBase(NetworkFilterNames::get().EnvoyMobileHttpConnectionManager, true) {
+      : ExceptionFreeFactoryBase(NetworkFilterNames::get().EnvoyClientHttpConnectionManager, true) {
   }
 
 private:
   absl::StatusOr<Network::FilterFactoryCb> createFilterFactoryFromProtoTyped(
       const envoy::extensions::filters::network::http_connection_manager::v3::
-          EnvoyMobileHttpConnectionManager& proto_config,
+          EnvoyClientHttpConnectionManager& proto_config,
       Server::Configuration::FactoryContext& context) override;
 };
 

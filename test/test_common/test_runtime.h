@@ -9,7 +9,7 @@
 //      {{"envoy.reloadable_features.test_feature_true", "false"}});
 //
 // TestScopedRuntime depends on the admin interface being compiled into the binary.
-// For build options where the admin interface is not available (particularly, Envoy Mobile), use
+// For build options where the admin interface is not available (particularly, Envoy Client), use
 // TestScopedStaticReloadableFeaturesRuntime. As the name suggests, it only works with reloadable
 // features:
 //

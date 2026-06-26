@@ -4010,7 +4010,7 @@ TEST_F(HttpConnectionManagerMobileConfigTest, Mobile) {
         "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   )EOF";
 
-  envoy::extensions::filters::network::http_connection_manager::v3::EnvoyMobileHttpConnectionManager
+  envoy::extensions::filters::network::http_connection_manager::v3::EnvoyClientHttpConnectionManager
       config;
   TestUtility::loadFromYamlAndValidate(yaml_string, config);
 

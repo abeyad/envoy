@@ -52,17 +52,17 @@ def envoy_select_static_extension_registration(xs, repository = ""):
         "//conditions:default": xs,
     })
 
-# Selects the given values if the Envoy Mobile listener is enabled in the current build.
-def envoy_select_envoy_mobile_listener(xs, repository = ""):
+# Selects the given values if the Envoy Client listener is enabled in the current build.
+def envoy_select_envoy_client_listener(xs, repository = ""):
     return select({
-        repository + "//bazel:disable_envoy_mobile_listener": [],
+        repository + "//bazel:disable_envoy_client_listener": [],
         "//conditions:default": xs,
     })
 
-# Selects the given values if Envoy Mobile xDS is enabled in the current build.
-def envoy_select_envoy_mobile_xds(xs, repository = ""):
+# Selects the given values if Envoy Client xDS is enabled in the current build.
+def envoy_select_envoy_client_xds(xs, repository = ""):
     return select({
-        repository + "//bazel:disable_envoy_mobile_xds": [],
+        repository + "//bazel:disable_envoy_client_xds": [],
         "//conditions:default": xs,
     })
 

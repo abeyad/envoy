@@ -68,7 +68,7 @@ check_legacy_dep_names com_github_cncf_xds xds
 
 CURRENT=check
 # This test runs code check with:
-#   bazel run //tools/code:check -- --fix -v warn -x mobile/dist/envoy-pom.xml
+#   bazel run //tools/code:check -- --fix -v warn -x client/dist/envoy-pom.xml
 # see: /tools/code/BUILD
 bazel "${BAZEL_STARTUP_OPTIONS[@]}" test "${BAZEL_BUILD_OPTIONS[@]}" //tools/code:check_test
 

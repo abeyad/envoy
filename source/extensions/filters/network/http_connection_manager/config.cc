@@ -334,7 +334,7 @@ HttpConnectionManagerFilterConfigFactory::createFilterFactoryFromProtoAndHopByHo
 absl::StatusOr<Network::FilterFactoryCb>
 MobileHttpConnectionManagerFilterConfigFactory::createFilterFactoryFromProtoTyped(
     const envoy::extensions::filters::network::http_connection_manager::v3::
-        EnvoyMobileHttpConnectionManager& mobile_config,
+        EnvoyClientHttpConnectionManager& mobile_config,
     Server::Configuration::FactoryContext& context) {
   return HttpConnectionManagerFilterConfigFactory::createFilterFactoryFromProtoAndHopByHop(
       mobile_config.config(), context, false);

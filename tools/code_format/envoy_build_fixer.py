@@ -3,7 +3,7 @@
 # Enforces:
 # - License headers on Envoy BUILD files
 # - envoy_package() top-level invocation for standard Envoy package setup.
-# - envoy_mobile_package() top-level invocation for standard Envoy Mobile package setup.
+# - envoy_client_package() top-level invocation for standard Envoy Client package setup.
 # - envoy_extension_package() top-level invocation for Envoy extensions.
 # - Infers API dependencies from source files.
 # - Misc. cleanups: avoids redundant blank lines, removes unused loads.
@@ -36,7 +36,7 @@ ENVOY_RULE_REGEX = re.compile(r'envoy[_\w]+\(')
 PACKAGE_LOAD_BLOCK_REGEX = re.compile(r'("envoy_package".*?\)\n)', re.DOTALL)
 EXTENSION_PACKAGE_LOAD_BLOCK_REGEX = re.compile(r'("envoy_extension_package".*?\)\n)', re.DOTALL)
 CONTRIB_PACKAGE_LOAD_BLOCK_REGEX = re.compile(r'("envoy_contrib_package".*?\)\n)', re.DOTALL)
-MOBILE_PACKAGE_LOAD_BLOCK_REGEX = re.compile(r'("envoy_mobile_package".*?\)\n)', re.DOTALL)
+MOBILE_PACKAGE_LOAD_BLOCK_REGEX = re.compile(r'("envoy_client_package".*?\)\n)', re.DOTALL)
 
 # Match Buildozer 'print' output. Example of Buildozer print output:
 # cc_library json_transcoder_filter_lib [json_transcoder_filter.cc] (missing) (missing)
@@ -73,7 +73,7 @@ def run_buildozer(cmds, contents):
         return r.stdout.decode('utf-8')
 
 
-# Add an Apache 2 license, envoy_package / envoy_mobile_package import and rule as needed.
+# Add an Apache 2 license, envoy_package / envoy_client_package import and rule as needed.
 def fix_package_and_license(path, contents):
     regex_to_use = PACKAGE_LOAD_BLOCK_REGEX
     package_string = 'envoy_package'
@@ -86,11 +86,11 @@ def fix_package_and_license(path, contents):
         regex_to_use = CONTRIB_PACKAGE_LOAD_BLOCK_REGEX
         package_string = 'envoy_contrib_package'
 
-    if os.getcwd().endswith('mobile') and 'library/common/extensions' not in path:
+    if os.getcwd().endswith('client') and 'library/common/extensions' not in path:
         regex_to_use = MOBILE_PACKAGE_LOAD_BLOCK_REGEX
-        package_string = 'envoy_mobile_package'
+        package_string = 'envoy_client_package'
 
-    # Ensure we have an envoy_package / envoy_mobile_package import load if this is a real Envoy package.
+    # Ensure we have an envoy_package / envoy_client_package import load if this is a real Envoy package.
     # We also allow the prefix to be overridden if envoy is included in a larger workspace.
     if "tools/" not in path and re.search(ENVOY_RULE_REGEX, contents):
         new_load = 'new_load {}//bazel:envoy_build_system.bzl %s' % package_string
@@ -98,7 +98,7 @@ def fix_package_and_license(path, contents):
             (new_load.format(os.getenv("ENVOY_BAZEL_PREFIX", "")), '__pkg__'),
         ], contents)
         # Envoy package is inserted after the load block containing the
-        # envoy_package / envoy_mobile_package import.
+        # envoy_package / envoy_client_package import.
         package_and_parens = package_string + '()'
         if package_and_parens[:-1] not in contents:
             contents = re.sub(regex_to_use, r'\1\n%s\n\n' % package_and_parens, contents)

@@ -25,7 +25,7 @@ are:
   so fundamental to Envoy that they will likely never be optional from a compilation perspective.
 * [linux/](linux/): Linux platform-specific configuration (e.g., amd64).
 * [maintainer/](maintainer/): Release process documentation for maintainers.
-* [mobile/](mobile/): Envoy Mobile — library for using Envoy on iOS and Android platforms.
+* [mobile/](mobile/): Envoy Client — library for using Envoy on iOS and Android platforms.
 * [restarter/](restarter/): Envoy's hot restart wrapper Python script.
 * [security/](security/): Some templates for reporting security issues of Envoy. Historical security issues can also be found here.
 * [source/](source/): Source code for core Envoy as well as extensions. The layout of this directory

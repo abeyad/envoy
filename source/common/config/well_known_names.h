@@ -212,7 +212,7 @@ private:
 using TagNames = ConstSingleton<TagNameValues>;
 
 // This class holds extension points which will always be built into Envoy in
-// server mode, but may be excluded from Envoy Mobile.
+// server mode, but may be excluded from Envoy Client.
 class ServerBuiltInExtensionValues {
 public:
   // Extension point for the default listener.

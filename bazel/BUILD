@@ -407,8 +407,8 @@ config_setting(
 )
 
 config_setting(
-    name = "disable_envoy_mobile_xds",
-    values = {"define": "envoy_mobile_xds=disabled"},
+    name = "disable_envoy_client_xds",
+    values = {"define": "envoy_client_xds=disabled"},
 )
 
 config_setting(
@@ -429,8 +429,8 @@ config_setting(
 )
 
 config_setting(
-    name = "disable_envoy_mobile_listener",
-    values = {"define": "envoy_mobile_listener=disabled"},
+    name = "disable_envoy_client_listener",
+    values = {"define": "envoy_client_listener=disabled"},
 )
 
 config_setting(

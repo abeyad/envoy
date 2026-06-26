@@ -163,7 +163,7 @@ envoy_cc_library(
     name = "envoy_main_common_lib",
     deps = [
         ":main_common_with_all_extensions_lib",
-        # These are compiled as extensions so Envoy Mobile doesn't have to link them in.
+        # These are compiled as extensions so Envoy Client doesn't have to link them in.
         # Envoy requires them.
         "//source/common/tls:server_context_lib",
         "//source/extensions/transport_sockets/tls:config",
@@ -181,7 +181,7 @@ envoy_cc_library(
     ] + envoy_select_enable_http3(["//source/common/quic:server_codec_lib"]),
 )
 
-# provides a library target for Envoy Mobile builds with the versioning information set up correctly.
+# provides a library target for Envoy Client builds with the versioning information set up correctly.
 envoy_cc_library(
     name = "envoy_stripped_main_base_lib",
     deps = [

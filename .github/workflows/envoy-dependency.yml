@@ -169,9 +169,9 @@ jobs:
             sha-devtools
             sha-docker
             sha-gcc
-            sha-mobile
+            sha-client
             sha-worker
-            mobile-sha
+            client-sha
             tag)
         for sha in "${shas[@]}"; do
             current_sha=$(bazel run --config=ci //tools/dependency:build-image-sha "$sha")
@@ -218,7 +218,7 @@ jobs:
            sha-devtools: docker.io/envoyproxy/envoy-build:devtools-${{ steps.build-tools.outputs.tag }}
            sha-docker: docker.io/envoyproxy/envoy-build:docker-${{ steps.build-tools.outputs.tag }}
            sha-gcc: docker.io/envoyproxy/envoy-build:gcc-${{ steps.build-tools.outputs.tag }}
-           sha-mobile: docker.io/envoyproxy/envoy-build:mobile-${{ steps.build-tools.outputs.tag }}
+           sha-client: docker.io/envoyproxy/envoy-build:mobile-${{ steps.build-tools.outputs.tag }}
            sha-worker: docker.io/envoyproxy/envoy-build:worker-${{ steps.build-tools.outputs.tag }}
 
     - run: |
@@ -228,7 +228,7 @@ jobs:
             "$CURRENT_ENVOY_SHA_DEVTOOLS:${{ fromJSON(steps.build-images.outputs.shas).sha-devtools }}"
             "$CURRENT_ENVOY_SHA_DOCKER:${{ fromJSON(steps.build-images.outputs.shas).sha-docker }}"
             "$CURRENT_ENVOY_SHA_GCC:${{ fromJSON(steps.build-images.outputs.shas).sha-gcc }}"
-            "$CURRENT_ENVOY_SHA_MOBILE:${{ fromJSON(steps.build-images.outputs.shas).sha-mobile }}"
+            "$CURRENT_ENVOY_SHA_CLIENT:${{ fromJSON(steps.build-images.outputs.shas).sha-client }}"
             "$CURRENT_ENVOY_SHA_WORKER:${{ fromJSON(steps.build-images.outputs.shas).sha-worker }}")
         echo "replace=${SHA_REPLACE[*]}" >> "$GITHUB_OUTPUT"
       name: Find SHAs to replace
@@ -240,7 +240,7 @@ jobs:
         CURRENT_ENVOY_SHA_DEVTOOLS: ${{ steps.current.outputs.sha-devtools }}
         CURRENT_ENVOY_SHA_DOCKER: ${{ steps.current.outputs.sha-docker }}
         CURRENT_ENVOY_SHA_GCC: ${{ steps.current.outputs.sha-gcc }}
-        CURRENT_ENVOY_SHA_MOBILE: ${{ steps.current.outputs.sha-mobile }}
+        CURRENT_ENVOY_SHA_CLIENT: ${{ steps.current.outputs.sha-client }}
         CURRENT_ENVOY_SHA_WORKER: ${{ steps.current.outputs.sha-worker }}
     - run: |
         echo "${SHA_REPLACE}" | xargs bazel run --config=ci @envoy_toolshed//sha:replace "${PWD}"

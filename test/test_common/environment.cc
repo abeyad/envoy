@@ -268,7 +268,7 @@ Server::Options& TestEnvironment::getOptions() {
 #ifdef ENVOY_DISABLE_EXCEPTIONS
   // tclap, used for command line parsing, throws exceptions. While Envoy won't
   // do full command line parsing in exception-free mode, handling -l trace is a
-  // nice-to-have for Envoy mobile e2e tests.
+  // nice-to-have for envoy client e2e tests.
   static OptionsImplBase* options = new OptionsImplBase();
   for (int i = 0; i < argc_; ++i) {
     if (absl::StartsWith(argv_[i], "-l ")) {
@@ -422,7 +422,7 @@ Json::ObjectSharedPtr TestEnvironment::jsonLoadFromString(const std::string& jso
                                Json::ObjectSharedPtr);
 }
 
-// This function is not used for Envoy Mobile tests, and ::system() is not supported on iOS.
+// This function is not used for Envoy Client tests, and ::system() is not supported on iOS.
 #ifndef TARGET_OS_IOS
 void TestEnvironment::exec(const std::vector<std::string>& args) {
   std::stringstream cmd;

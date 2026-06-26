@@ -59,7 +59,7 @@ TEST(Context, RequestAttributes) {
   NiceMock<StreamInfo::MockStreamInfo> empty_info;
   Http::TestRequestHeaderMapImpl header_map{
       {":method", "POST"},           {":scheme", "http"},      {":path", "/meow?yes=1"},
-      {":authority", "kittens.com"}, {"referer", "dogs.com"},  {"user-agent", "envoy-mobile"},
+      {":authority", "kittens.com"}, {"referer", "dogs.com"},  {"user-agent", "envoy-client"},
       {"content-length", "10"},      {"x-request-id", "blah"}, {"double-header", "foo"},
       {"double-header", "bar"}};
   Protobuf::Arena arena;
@@ -142,7 +142,7 @@ TEST(Context, RequestAttributes) {
     auto value = request[CelValue::CreateStringView(UserAgent)];
     EXPECT_TRUE(value.has_value());
     ASSERT_TRUE(value.value().IsString());
-    EXPECT_EQ("envoy-mobile", value.value().StringOrDie().value());
+    EXPECT_EQ("envoy-client", value.value().StringOrDie().value());
   }
 
   {

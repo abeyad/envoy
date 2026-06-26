@@ -315,7 +315,7 @@ new_features:
     health check for the endpoint.
 - area: mobile
   change: |
-    merged the Envoy mobile library into the main Envoy repo.
+    merged the envoy client library into the main Envoy repo.
 - area: matching
   change: |
     support filter chain selection based on the dynamic metadata and the filter state using :ref:`formatter actions

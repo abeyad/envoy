@@ -1,4 +1,4 @@
-# Should contain https://github.com/envoyproxy/envoy-mobile/blob/main/envoy_build_config/extensions_build_config.bzl
+# Should contain https://github.com/envoyproxy/envoy-client/blob/main/envoy_build_config/extensions_build_config.bzl
 # plus a few commonly used filters to verify they compile.
 EXTENSIONS = {
     # Mobile
@@ -37,8 +37,10 @@ WINDOWS_EXTENSIONS = {}
 EXTENSION_CONFIG_VISIBILITY = ["//:extension_config"]
 EXTENSION_PACKAGE_VISIBILITY = ["//:extension_library"]
 CONTRIB_EXTENSION_PACKAGE_VISIBILITY = ["//:contrib_library"]
-MOBILE_PACKAGE_VISIBILITY = ["//:mobile_library"]
+CLIENT_PACKAGE_VISIBILITY = ["//:client_library"]
+# Deprecated: use CLIENT_PACKAGE_VISIBILITY instead
+MOBILE_PACKAGE_VISIBILITY = CLIENT_PACKAGE_VISIBILITY
 
-# As part of (https://github.com/envoyproxy/envoy-mobile/issues/175) we turned down alwayslink for envoy libraries
+# As part of (https://github.com/envoyproxy/envoy-client/issues/175) we turned down alwayslink for envoy libraries
 # This tracks libraries that should be registered as extensions.
 LEGACY_ALWAYSLINK = 1

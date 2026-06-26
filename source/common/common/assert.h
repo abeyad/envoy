@@ -166,7 +166,7 @@ void resetEnvoyBugCountersForTest();
 #define RELEASE_ASSERT(X, DETAILS) _ASSERT_IMPL(X, #X, ::abort(), DETAILS)
 
 /**
- * Assert macro intended for Envoy Mobile. It creates enforcement for mobile
+ * Assert macro intended for Envoy Client. It creates enforcement for mobile
  * clients but has no effect for Envoy as a server.
  */
 #if TARGET_OS_IOS || defined(__ANDROID_API__)

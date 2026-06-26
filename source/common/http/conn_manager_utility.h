@@ -89,7 +89,7 @@ public:
    * @param stream_info a reference to the filter manager stream info.
    * @param proxy_name the proxy name.
    * @param clear_hop_by_hop_headers true if hop by hop headers should be
-   *        cleared. This should only ever be false for envoy-mobile.
+   *        cleared. This should only ever be false for envoy-client.
    */
   static void mutateResponseHeaders(ResponseHeaderMap& response_headers,
                                     const RequestHeaderMap* request_headers,

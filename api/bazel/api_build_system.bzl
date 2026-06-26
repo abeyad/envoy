@@ -82,7 +82,7 @@ def api_cc_py_proto_library(
         visibility = visibility,
     )
 
-    # This is to support Envoy Mobile using Protobuf-Lite.
+    # This is to support Envoy Client using Protobuf-Lite.
     # Protobuf-Lite generated C++ code does not include reflection
     # capabilities but analogous functionality can be provided by
     # cc_proto_descriptor_library.

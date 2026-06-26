@@ -29,8 +29,8 @@ public:
                                    Server::Configuration::Initial& config) override;
 };
 
-// This is the common main between Envoy and Envoy mobile.
-// It is stripped down to functionality required by Envoy Mobile: anything
+// This is the common main between Envoy and envoy client.
+// It is stripped down to functionality required by Envoy Client: anything
 // server-specific should live in MainCommonBase or MainCommon which remain
 // separate for legacy reasons.
 class StrippedMainBase {

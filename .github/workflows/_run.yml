@@ -359,7 +359,7 @@ jobs:
         ssh-key: ${{ inputs.trusted && inputs.ssh-key || '' }}
         token: ${{ inputs.trusted && steps.appauth.outputs.token || github.token }}
 
-    # This is currently only use by mobile-docs and can be removed once they are updated to the newer website
+    # This is currently only use by client-docs and can be removed once they are updated to the newer website
     - uses: envoyproxy/toolshed/actions/github/checkout@1f5b552c6749502b885cb8cf23549b929e745547  # actions-v0.4.17
       id: checkout-extra
       name: Checkout extra repository (for publishing)

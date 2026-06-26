@@ -70,7 +70,7 @@ public:
 
   ThreadLocal::SlotPtr tls_;
   // The admin code runs in non-permissive mode, rejecting connections and
-  // ensuring timer code is not called. Envoy mobile uses permissive mode and
+  // ensuring timer code is not called. envoy client uses permissive mode and
   // does the opposite.
   const bool permissive_;
 };

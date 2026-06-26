@@ -15,7 +15,7 @@ load(
     "envoy_linkstatic",
     "repo_label",
 )
-load(":envoy_mobile_defines.bzl", "envoy_mobile_defines")
+load(":envoy_client_defines.bzl", "envoy_client_defines")
 load(":envoy_pch.bzl", "envoy_pch_copts", "envoy_pch_deps")
 load(":sanitizers.bzl", "sanitizer_deps")
 
@@ -137,7 +137,7 @@ def envoy_cc_library(
         linkstatic = envoy_linkstatic(),
         strip_include_prefix = strip_include_prefix,
         include_prefix = include_prefix,
-        defines = envoy_mobile_defines(repository) + defines,
+        defines = envoy_client_defines(repository) + defines,
         local_defines = local_defines,
         target_compatible_with = target_compatible_with,
     )

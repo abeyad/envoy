@@ -17,7 +17,7 @@ envoy_cc_extension(
         "validation_listener_manager.h",
     ],
     # any changes to this should be reviewed by mobile maintainers
-    # to ensure that listener code doesn't leak back into Envoy Mobile.
+    # to ensure that listener code doesn't leak back into Envoy Client.
     extra_visibility = [
         "//source/server/admin:__subpackages__",
         "//test:__subpackages__",

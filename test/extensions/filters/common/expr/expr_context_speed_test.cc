@@ -94,7 +94,7 @@ private:
   Http::TestRequestHeaderMapImpl makeRequestHeaders() {
     return Http::TestRequestHeaderMapImpl{{":method", "POST"},      {":scheme", "http"},
                                           {":path", "/meow?yes=1"}, {":authority", "kittens.com"},
-                                          {"referer", "dogs.com"},  {"user-agent", "envoy-mobile"},
+                                          {"referer", "dogs.com"},  {"user-agent", "envoy-client"},
                                           {"content-length", "10"}, {"x-request-id", "blah"}};
   }
 

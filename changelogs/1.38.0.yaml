@@ -1112,6 +1112,6 @@ new_features:
   change: |
     Added SCONE (Standardized Communication with Network Elements) support for QUIC. This includes
     a new :ref:`enable_scone <envoy_v3_api_field_config.core.v3.QuicProtocolOptions.enable_scone>`
-    field in ``QuicProtocolOptions``, and support in Envoy Mobile via a new ``enableScone()`` API in
+    field in ``QuicProtocolOptions``, and support in Envoy Client via a new ``enableScone()`` API in
     ``EngineBuilder``. SCONE bandwidth and timestamp data are now propagated to the application via
     new ``scone_max_kbps`` and ``scone_timestamp_ms`` fields in the ``envoy_stream_intel`` struct.

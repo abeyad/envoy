@@ -7,7 +7,7 @@ set -e -o pipefail
 IS_MOBILE="${IS_MOBILE:-}"
 if [[ -z "$IS_MOBILE" ]]; then
     cwd="$(basename "$PWD")"
-    if [[ "$cwd" == "mobile" ]]; then
+    if [[ "$cwd" == "client" ]]; then
         IS_MOBILE=true
     fi
 fi

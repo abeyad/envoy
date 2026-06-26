@@ -420,7 +420,7 @@ message Bootstrap {
 
   // [#not-implemented-hide:]
   // This controls the type of listener manager configured for Envoy. Currently
-  // Envoy only supports ``ListenerManager`` for this field and Envoy Mobile
+  // Envoy only supports ``ListenerManager`` for this field and Envoy Client
   // supports ``ApiListenerManager``.
   core.v3.TypedExtensionConfig listener_manager = 37;
 

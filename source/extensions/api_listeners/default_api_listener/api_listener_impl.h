@@ -35,7 +35,7 @@ class ApiListenerImplBase : public Server::ApiListener,
                             public Network::DrainDecision,
                             Logger::Loggable<Logger::Id::http> {
 public:
-  // TODO(junr03): consider moving Envoy Mobile's SyntheticAddressImpl to Envoy in order to return
+  // TODO(junr03): consider moving Envoy Client's SyntheticAddressImpl to Envoy in order to return
   // that rather than this semi-real one.
   const Network::Address::InstanceConstSharedPtr& address() const { return address_; }
 

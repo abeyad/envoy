@@ -11,7 +11,7 @@ This repository contains the Envoy proxy, a cloud-native high-performance edge/m
 - **api/** - Protocol buffer definitions for Envoy's APIs (xDS, filters, etc.)
 - **bazel/** - Bazel build configurations, rules, and toolchain definitions
 - **contrib/** - Community-contributed extensions
-- **mobile/** - Envoy Mobile implementation
+- **mobile/** - Envoy Client implementation
 - **tools/** - Development tooling, scripts, and utilities
 - **docs/** - Documentation source files
 

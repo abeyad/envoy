@@ -4692,6 +4692,63 @@ TEST_P(TcpClientConnectionImplTest, BadConnectConnRefusedWithTransportError) {
   EXPECT_THAT(connection->transportFailureReason(), EndsWith("custom error"));
 }
 
+TEST_P(TcpClientConnectionImplTest, ClosedSocketBeforeConnectDoesNotCrash) {
+  Address::InstanceConstSharedPtr address = *Utility::resolveUrl(
+      fmt::format("tcp://{}:1", Network::Test::getLoopbackAddressUrlString(GetParam())));
+  auto socket = std::make_unique<ClientSocketImpl>(address, nullptr);
+  auto* socket_ptr = socket.get();
+  auto connection = std::make_unique<ClientConnectionImpl>(
+      *dispatcher_, std::move(socket), Network::Address::InstanceConstSharedPtr(),
+      Network::Test::createRawBufferSocket(), nullptr, nullptr);
+
+  socket_ptr->close();
+  ASSERT_FALSE(socket_ptr->isOpen());
+  connection->noDelay(true);
+  connection->connect();
+  EXPECT_TRUE(connection->transportFailureReason().empty());
+}
+
+TEST_P(TcpClientConnectionImplTest, SocketCreationFailureConnectDoesNotCrash) {
+  auto mock_interface =
+      std::make_unique<MockSocketInterface>(std::vector<Address::IpVersion>{GetParam()});
+  auto* mock_interface_ptr = mock_interface.get();
+  StackedScopedInjectableLoaderForTest<SocketInterface> new_interface(std::move(mock_interface));
+
+  Address::InstanceConstSharedPtr address = *Utility::resolveUrl(
+      fmt::format("tcp://{}:1", Network::Test::getLoopbackAddressUrlString(GetParam())));
+#if defined(NDEBUG) || defined(ENVOY_CONFIG_COVERAGE)
+  EXPECT_CALL(*mock_interface_ptr, socket(_, _, _)).WillOnce(Return(testing::ByMove(nullptr)));
+  ClientConnectionPtr connection;
+  EXPECT_ENVOY_BUG(connection = dispatcher_->createClientConnection(
+                       address, Network::Address::InstanceConstSharedPtr(),
+                       Network::Test::createRawBufferSocket(), nullptr, nullptr),
+                   "Client socket failure");
+  StrictMock<MockConnectionCallbacks> callbacks;
+  connection->addConnectionCallbacks(callbacks);
+
+  // Calling noDelay() and connect() synchronously before the deferred LocalClose runs must not
+  // dereference a null IoHandle or uninitialized UpstreamInfo.
+  connection->noDelay(true);
+  connection->connect();
+
+  EXPECT_CALL(callbacks, onEvent(ConnectionEvent::LocalClose));
+  dispatcher_->run(Event::Dispatcher::RunType::Block);
+  EXPECT_EQ(connection->state(), Connection::State::Closed);
+  EXPECT_EQ(connection->transportFailureReason(), "socket creation failure");
+#else
+  EXPECT_ENVOY_BUG(
+      {
+        EXPECT_CALL(*mock_interface_ptr, socket(_, _, _))
+            .WillOnce(Return(testing::ByMove(nullptr)));
+        ClientConnectionPtr connection = dispatcher_->createClientConnection(
+            address, Network::Address::InstanceConstSharedPtr(),
+            Network::Test::createRawBufferSocket(), nullptr, nullptr);
+        connection->connect();
+      },
+      "Client socket failure");
+#endif
+}
+
 class PipeClientConnectionImplTest : public testing::Test {
 protected:
   PipeClientConnectionImplTest()

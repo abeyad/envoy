@@ -69,6 +69,9 @@ QuicPlatformPacketWriterFactory::createSocketAndQuicPacketWriter(
 
   Network::ConnectionSocketPtr connection_socket =
       createConnectionSocket(server_addr, local_addr, options, network, custom_bind_func);
+  if (!connection_socket->isOpen()) {
+    return {nullptr, std::move(connection_socket)};
+  }
 
   Network::IoHandle& io_handle = connection_socket->ioHandle();
   return {std::make_unique<EnvoyQuicPacketWriter>(

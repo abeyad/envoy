@@ -1173,6 +1173,10 @@ ClientConnectionImpl::~ClientConnectionImpl() {
 }
 
 void ClientConnectionImpl::connect() {
+  if (!socket_->isOpen()) {
+    // Socket creation failed in the constructor, which already posted a deferred LocalClose event.
+    return;
+  }
   ENVOY_CONN_LOG_EVENT(debug, "client_connection", "connecting to {}", *this,
                        socket_->connectionInfoProvider().remoteAddress()->asString());
   const Api::SysCallIntResult result = transport_socket_->connect(*socket_);

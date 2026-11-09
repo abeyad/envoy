@@ -82,7 +82,15 @@ void EnvoyQuicClientConnection::EnvoyQuicClinetPathContextFactory::CreatePathVal
   QuicClientPacketWriterFactory::CreationResult result =
       writer_factory_.createSocketAndQuicPacketWriter(remote_address, network, new_local_address,
                                                       connection_.connectionSocket()->options());
+  if (!result.socket_->isOpen() || result.writer_ == nullptr || new_local_address == nullptr) {
+    result_delegate->OnCreationFailed(network, "Failed to create probing socket.");
+    return;
+  }
   connection_.setUpConnectionSocket(*result.socket_, connection_.delegate_);
+  if (!result.socket_->isOpen()) {
+    result_delegate->OnCreationFailed(network, "Failed to set up probing socket.");
+    return;
+  }
   result_delegate->OnCreationSucceeded(std::make_unique<EnvoyQuicClientPathValidationContext>(
       envoyIpAddressToQuicSocketAddress(new_local_address->ip()), peer_address, network,
       std::move(result.writer_), std::move(result.socket_), connection_.dispatcher_));
@@ -219,6 +227,9 @@ void EnvoyQuicClientConnection::setUpConnectionSocket(Network::ConnectionSocket&
 
 void EnvoyQuicClientConnection::switchConnectionSocket(
     Network::ConnectionSocketPtr&& connection_socket) {
+  if (!connection_socket->isOpen()) {
+    return;
+  }
   auto writer = std::make_unique<EnvoyQuicPacketWriter>(
       std::make_unique<Network::UdpDefaultWriter>(connection_socket->ioHandle()));
   quic::QuicSocketAddress self_address = envoyIpAddressToQuicSocketAddress(
@@ -267,7 +278,15 @@ void EnvoyQuicClientConnection::probeWithNewPort(const quic::QuicSocketAddress& 
                ? connectionSocket()->connectionInfoProvider().remoteAddress()
                : quicAddressToEnvoyAddressInstance(peer_addr)),
           quic::kInvalidNetworkHandle, new_local_address, connectionSocket()->options());
+  if (!creation_result.socket_->isOpen() || creation_result.writer_ == nullptr) {
+    ENVOY_CONN_LOG(error, "Failed to create probing socket for port migration", *this);
+    return;
+  }
   setUpConnectionSocket(*creation_result.socket_, delegate_);
+  if (!creation_result.socket_->isOpen() ||
+      creation_result.socket_->connectionInfoProvider().localAddress() == nullptr) {
+    return;
+  }
   auto writer = std::move(creation_result.writer_);
   quic::QuicSocketAddress self_address = envoyIpAddressToQuicSocketAddress(
       creation_result.socket_->connectionInfoProvider().localAddress()->ip());

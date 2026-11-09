@@ -173,5 +173,34 @@ TEST_F(QuicPlatformPacketWriterFactoryTest, OtherErrorCodesNoRetry) {
   writePacketAndVerifyResult(quic::WRITE_STATUS_ERROR, SOCKET_ERROR_PERM);
 }
 
+class NullSocketInterface : public Network::SocketInterface {
+public:
+  Network::IoHandlePtr socket(Network::Socket::Type, Network::Address::Type,
+                              Network::Address::IpVersion, bool,
+                              const Network::SocketCreationOptions&) const override {
+    return nullptr;
+  }
+  Network::IoHandlePtr socket(Network::Socket::Type, const Network::Address::InstanceConstSharedPtr,
+                              const Network::SocketCreationOptions&) const override {
+    return nullptr;
+  }
+  bool ipFamilySupported(int) override { return true; }
+};
+
+TEST_F(QuicPlatformPacketWriterFactoryTest, SocketCreationFailureReturnsNullWriter) {
+  auto null_interface = std::make_unique<NullSocketInterface>();
+  StackedScopedInjectableLoaderForTest<Network::SocketInterface> new_interface(
+      std::move(null_interface));
+
+  Network::Address::InstanceConstSharedPtr peer_address =
+      quicAddressToEnvoyAddressInstance(peer_addr_);
+  Network::Address::InstanceConstSharedPtr local_address;
+  QuicClientPacketWriterFactory::CreationResult result = factory_.createSocketAndQuicPacketWriter(
+      peer_address, /*network=*/123, local_address, nullptr);
+  EXPECT_NE(result.socket_, nullptr);
+  EXPECT_FALSE(result.socket_->isOpen());
+  EXPECT_EQ(result.writer_, nullptr);
+}
+
 } // namespace Quic
 } // namespace Envoy

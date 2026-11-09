@@ -9,6 +9,7 @@
 #include "test/mocks/common.h"
 #include "test/mocks/event/mocks.h"
 #include "test/mocks/http/http_server_properties_cache.h"
+#include "test/mocks/network/mocks.h"
 #include "test/mocks/server/server_factory_context.h"
 #include "test/mocks/ssl/mocks.h"
 #include "test/mocks/upstream/cluster_info.h"
@@ -238,11 +239,49 @@ TEST_P(QuicNetworkConnectionTest, PreBindSocketOptionsFailure) {
       quic::QuicServerId{factory_->clientContextConfig()->serverNameIndication(), PEER_PORT},
       dispatcher_, test_address_, local_address_, quic_stat_names_, {}, *store_.rootScope(),
       socket_options, nullptr, connection_id_generator_, *factory_);
-  EnvoyQuicClientSession* session = static_cast<EnvoyQuicClientSession*>(client_connection.get());
-  session->Initialize();
-  client_connection->connect();
-  EXPECT_FALSE(session->connection()->connected());
-  EXPECT_EQ(client_connection->state(), Network::Connection::State::Closed);
+  EXPECT_EQ(client_connection, nullptr);
+}
+
+TEST_P(QuicNetworkConnectionTest, WriterFactorySocketCreationFailure) {
+  initialize();
+
+  auto mock_interface = std::make_unique<Network::MockSocketInterface>(
+      std::vector<Network::Address::IpVersion>{GetParam()});
+  EXPECT_CALL(*mock_interface, socket(testing::_, testing::_, testing::_))
+      .WillOnce(Return(testing::ByMove(nullptr)));
+  StackedScopedInjectableLoaderForTest<Network::SocketInterface> new_interface(
+      std::move(mock_interface));
+
+  Network::Address::InstanceConstSharedPtr peer_addr = *Network::Utility::resolveUrl(absl::StrCat(
+      "udp://", Network::Test::getLoopbackAddressUrlString(GetParam()), ":", PEER_PORT));
+  Network::Address::InstanceConstSharedPtr local_addr;
+  QuicClientPacketWriterFactory::CreationResult result =
+      quic_info_->writer_factory_->createSocketAndQuicPacketWriter(
+          peer_addr, quic::kInvalidNetworkHandle, local_addr, nullptr);
+  EXPECT_NE(result.socket_, nullptr);
+  EXPECT_FALSE(result.socket_->isOpen());
+  EXPECT_EQ(result.writer_, nullptr);
+}
+
+TEST_P(QuicNetworkConnectionTest, SocketCreationFailure) {
+  initialize();
+
+  auto mock_interface = std::make_unique<Network::MockSocketInterface>(
+      std::vector<Network::Address::IpVersion>{GetParam()});
+  EXPECT_CALL(*mock_interface, socket(testing::_, testing::_, testing::_))
+      .WillOnce(Return(testing::ByMove(nullptr)));
+  StackedScopedInjectableLoaderForTest<Network::SocketInterface> new_interface(
+      std::move(mock_interface));
+
+  Network::Address::InstanceConstSharedPtr peer_addr = *Network::Utility::resolveUrl(absl::StrCat(
+      "udp://", Network::Test::getLoopbackAddressUrlString(GetParam()), ":", PEER_PORT));
+  Network::Address::InstanceConstSharedPtr local_addr;
+  std::unique_ptr<Network::ClientConnection> client_connection = createQuicNetworkConnection(
+      *quic_info_, crypto_config_,
+      quic::QuicServerId{factory_->clientContextConfig()->serverNameIndication(), PEER_PORT},
+      dispatcher_, peer_addr, local_addr, quic_stat_names_, {}, *store_.rootScope(), nullptr,
+      nullptr, connection_id_generator_, *factory_);
+  EXPECT_EQ(client_connection, nullptr);
 }
 
 TEST_P(QuicNetworkConnectionTest, PostBindSocketOptionsFailure) {
@@ -260,6 +299,26 @@ TEST_P(QuicNetworkConnectionTest, PostBindSocketOptionsFailure) {
       quic::QuicServerId{factory_->clientContextConfig()->serverNameIndication(), PEER_PORT},
       dispatcher_, test_address_, local_address_, quic_stat_names_, {}, *store_.rootScope(),
       socket_options, nullptr, connection_id_generator_, *factory_);
+  EXPECT_EQ(client_connection, nullptr);
+}
+
+TEST_P(QuicNetworkConnectionTest, ListeningSocketOptionsFailure) {
+  initialize();
+
+  auto socket_option = std::make_shared<Network::MockSocketOption>();
+  auto socket_options = std::make_shared<Network::ConnectionSocket::Options>();
+  socket_options->push_back(socket_option);
+  EXPECT_CALL(*socket_option, setOption(_, envoy::config::core::v3::SocketOption::STATE_PREBIND));
+  EXPECT_CALL(*socket_option, setOption(_, envoy::config::core::v3::SocketOption::STATE_BOUND));
+  EXPECT_CALL(*socket_option, setOption(_, envoy::config::core::v3::SocketOption::STATE_LISTENING))
+      .WillOnce(Return(false));
+
+  std::unique_ptr<Network::ClientConnection> client_connection = createQuicNetworkConnection(
+      *quic_info_, crypto_config_,
+      quic::QuicServerId{factory_->clientContextConfig()->serverNameIndication(), PEER_PORT},
+      dispatcher_, test_address_, local_address_, quic_stat_names_, {}, *store_.rootScope(),
+      socket_options, nullptr, connection_id_generator_, *factory_);
+  ASSERT_NE(client_connection, nullptr);
   EnvoyQuicClientSession* session = static_cast<EnvoyQuicClientSession*>(client_connection.get());
   session->Initialize();
   client_connection->connect();
@@ -307,12 +366,7 @@ TEST_P(QuicNetworkConnectionTest, GetV6OnlySocketOptionFailure) {
       quic::QuicServerId{factory_->clientContextConfig()->serverNameIndication(), PEER_PORT},
       dispatcher_, test_address_, local_address_, quic_stat_names_, {}, *store_.rootScope(),
       nullptr, nullptr, connection_id_generator_, *factory_);
-  EnvoyQuicClientSession* session = static_cast<EnvoyQuicClientSession*>(client_connection.get());
-  session->Initialize();
-  client_connection->connect();
-  EXPECT_TRUE(client_connection->connecting());
-  EXPECT_FALSE(session->connection()->connected());
-  EXPECT_EQ(client_connection->state(), Network::Connection::State::Closed);
+  EXPECT_EQ(client_connection, nullptr);
 }
 
 TEST_P(QuicNetworkConnectionTest, Srtt) {

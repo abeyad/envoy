@@ -987,5 +987,91 @@ TEST_P(EnvoyQuicClientSessionTest, ScopedIpv6PortMigrationCrash) {
   // SPELLCHECKER(on)
   EXPECT_NO_THROW(quic_connection_->OnPathDegradingDetected());
 }
+
+TEST_P(EnvoyQuicClientSessionTest, PortMigrationSocketCreationFailureDoesNotCrash) {
+  quic::QuicNewConnectionIdFrame frame;
+  frame.connection_id = quic::test::TestConnectionId(1234);
+  ASSERT_NE(frame.connection_id, quic_connection_->connection_id());
+  frame.stateless_reset_token = quic::QuicUtils::GenerateStatelessResetToken(frame.connection_id);
+  frame.retire_prior_to = 0u;
+  frame.sequence_number = 1u;
+  quic_connection_->OnNewConnectionIdFrame(frame);
+  quic_connection_->SetSelfAddress(envoyIpAddressToQuicSocketAddress(self_addr_->ip()));
+
+  const Network::Address::IpVersion ip_version = peer_addr_->ip()->version();
+  auto mock_interface = std::make_unique<Network::MockSocketInterface>(
+      std::vector<Network::Address::IpVersion>{ip_version});
+  EXPECT_CALL(*mock_interface, socket(_, _, _)).WillOnce(Return(testing::ByMove(nullptr)));
+  StackedScopedInjectableLoaderForTest<Network::SocketInterface> new_interface(
+      std::move(mock_interface));
+
+  auto local_addr_with_mock_interface = *Network::Utility::resolveUrl(
+      fmt::format("udp://{}:{}", Network::Test::getLoopbackAddressUrlString(ip_version),
+                  self_addr_->ip()->port()));
+  auto remote_addr_with_mock_interface = *Network::Utility::resolveUrl(
+      fmt::format("udp://{}:{}", Network::Test::getLoopbackAddressUrlString(ip_version),
+                  peer_addr_->ip()->port()));
+  quic_connection_->connectionSocket()->connectionInfoProvider().setLocalAddress(
+      local_addr_with_mock_interface);
+  quic_connection_->connectionSocket()->connectionInfoProvider().setRemoteAddress(
+      remote_addr_with_mock_interface);
+
+  quic_connection_->OnPathDegradingDetected();
+  EXPECT_FALSE(envoy_quic_session_->HasPendingPathValidation());
+  EXPECT_TRUE(quic_connection_->connected());
+}
+
+class TestPathContextCreationResultDelegate
+    : public quic::QuicPathContextFactory::CreationResultDelegate {
+public:
+  TestPathContextCreationResultDelegate(bool& failed, quic::QuicNetworkHandle& failed_network)
+      : failed_(failed), failed_network_(failed_network) {}
+
+  void OnCreationSucceeded(std::unique_ptr<quic::QuicClientPathValidationContext>) override {
+    ADD_FAILURE() << "Expected path context creation to fail when socket creation fails.";
+  }
+
+  void OnCreationFailed(quic::QuicNetworkHandle network, absl::string_view error) override {
+    EXPECT_FALSE(error.empty());
+    failed_ = true;
+    failed_network_ = network;
+  }
+
+private:
+  bool& failed_;
+  quic::QuicNetworkHandle& failed_network_;
+};
+
+TEST_P(EnvoyQuicClientSessionTest, NetworkMigrationSocketCreationFailureDoesNotCrash) {
+  if (!quiche_handles_migration_) {
+    return;
+  }
+  const Network::Address::IpVersion ip_version = peer_addr_->ip()->version();
+  auto mock_interface = std::make_unique<Network::MockSocketInterface>(
+      std::vector<Network::Address::IpVersion>{ip_version});
+  EXPECT_CALL(*mock_interface, socket(_, _, _)).WillOnce(Return(testing::ByMove(nullptr)));
+  StackedScopedInjectableLoaderForTest<Network::SocketInterface> new_interface(
+      std::move(mock_interface));
+
+  auto remote_addr_with_mock_interface = *Network::Utility::resolveUrl(
+      fmt::format("udp://{}:{}", Network::Test::getLoopbackAddressUrlString(ip_version),
+                  peer_addr_->ip()->port()));
+  quic_connection_->connectionSocket()->connectionInfoProvider().setRemoteAddress(
+      remote_addr_with_mock_interface);
+
+  bool creation_failed = false;
+  quic::QuicNetworkHandle failed_network = quic::kInvalidNetworkHandle;
+  std::unique_ptr<quic::QuicPathContextFactory> path_context_factory =
+      quic_connection_->getOrCreateMigrationHelper(writer_factory_, quic::kInvalidNetworkHandle, {})
+          .CreateQuicPathContextFactory();
+  // Pass a valid network handle so new_local_address starts as nullptr.
+  constexpr quic::QuicNetworkHandle kTargetNetwork = 1;
+  path_context_factory->CreatePathValidationContext(
+      kTargetNetwork, quic_connection_->peer_address(),
+      std::make_unique<TestPathContextCreationResultDelegate>(creation_failed, failed_network));
+  EXPECT_TRUE(creation_failed);
+  EXPECT_EQ(failed_network, kTargetNetwork);
+  EXPECT_TRUE(quic_connection_->connected());
+}
 } // namespace Quic
 } // namespace Envoy
